@@ -104,7 +104,7 @@ export default function Message({ message, onDelete }: TProps) {
       {message.is_deleted ? (
         <p
           className={cn(
-            "px-4 py-3 border border-muted-foreground text-muted-foreground opacity-50 italic select-none cursor-default rounded-md w-fit max-w-[calc(100%-5rem)] md:max-w-[calc(100%-7rem)] lg:max-w-[calc(100%-13rem)]",
+            "px-4 py-3 border border-muted-foreground text-muted-foreground opacity-50 italic select-none cursor-default rounded-md w-fit max-w-[calc(100%-3rem)] md:max-w-[calc(100%-7rem)] lg:max-w-[calc(100%-13rem)]",
             isSender(message.sender_id) && "ml-auto"
           )}
         >
@@ -114,7 +114,7 @@ export default function Message({ message, onDelete }: TProps) {
       ) : (
         <div
           className={cn(
-            "relative px-4 py-3 rounded-md w-fit max-w-[calc(100%-5rem)] md:max-w-[calc(100%-7rem)] lg:max-w-[calc(100%-13rem)]",
+            "relative px-4 py-3 rounded-md w-fit max-w-[calc(100%-3rem)] md:max-w-[calc(100%-7rem)] lg:max-w-[calc(100%-13rem)]",
             isSender(message.sender_id)
               ? "bg-loveRose text-primary-foreground ml-auto rounded-br-none"
               : "bg-gray-200 rounded-bl-none",

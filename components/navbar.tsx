@@ -8,7 +8,7 @@ export default function Navbar() {
   if (!isSignedIn) return null;
 
   return (
-    <nav className="fixed top-2 right-2">
+    <nav className="fixed top-2 right-2 z-50">
       <UserButton />
     </nav>
   );

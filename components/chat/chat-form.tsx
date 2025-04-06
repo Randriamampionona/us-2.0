@@ -7,6 +7,7 @@ import {
   ChangeEvent,
   FormEvent,
   KeyboardEvent,
+  MouseEvent,
   useEffect,
   useRef,
   useState,
@@ -37,9 +38,7 @@ export default function ChatForm() {
     setValue(e.target.value);
   };
 
-  const onSend = async (e?: FormEvent<HTMLFormElement>) => {
-    e?.preventDefault();
-
+  const onSend = async () => {
     if (isPending || !userId || !user || !value.trim()) return;
 
     setIsPending(true);
@@ -73,14 +72,6 @@ export default function ChatForm() {
     }
   };
 
-  const onEnterPress = async (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    // Check if Enter is pressed without Shift key
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      await onSend();
-    }
-  };
-
   useEffect(() => {
     if (!!message_id) {
       setValue(message);
@@ -104,10 +95,7 @@ export default function ChatForm() {
 
   return (
     <div className="w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-fit pt-2 space-y-4">
-      <form
-        className="flex items-end justify-between gap-x-2 w-full"
-        onSubmit={onSend}
-      >
+      <form className="flex items-end justify-between gap-x-2 w-full">
         <textarea
           autoFocus
           ref={textareaRef}
@@ -115,7 +103,6 @@ export default function ChatForm() {
           placeholder="Type your message here."
           value={value}
           disabled={isPending}
-          onKeyDown={onEnterPress}
           onChange={onChangeFn}
         />
 
@@ -130,7 +117,12 @@ export default function ChatForm() {
           </PopoverContent>
         </Popover>
 
-        <Button size={"icon"} type="submit" disabled={isPending || !value}>
+        <Button
+          size={"icon"}
+          type="submit"
+          disabled={isPending || !value}
+          onClick={onSend}
+        >
           <Send />
         </Button>
       </form>
