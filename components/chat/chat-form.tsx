@@ -92,6 +92,13 @@ export default function ChatForm() {
     if (textareaRef.current) {
       textareaRef.current.style.height = !value.trim() ? "2.5rem" : "auto"; // Reset height to auto before recalculating
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Set to scrollHeight
+      // Add overflow-y auto if height exceeds 15rem
+      if (textareaRef.current.scrollHeight > 20 * 16) {
+        // 15rem in pixels (16px per rem)
+        textareaRef.current.style.overflowY = "auto";
+      } else {
+        textareaRef.current.style.overflowY = "hidden"; // or "initial" depending on your preference
+      }
     }
   }, [value]);
 
@@ -103,12 +110,12 @@ export default function ChatForm() {
       >
         <textarea
           autoFocus
-          className="flex-1 resize-none overflow-y-hidden flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
           ref={textareaRef}
-          onKeyDown={onEnterPress}
+          className="flex-1 resize-none overflow-y-hidden flex h-10 max-h-80 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
           placeholder="Type your message here."
           value={value}
           disabled={isPending}
+          onKeyDown={onEnterPress}
           onChange={onChangeFn}
         />
 
@@ -119,7 +126,7 @@ export default function ChatForm() {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="end">
-            <Emoji setValue={setValue} />
+            <Emoji setValue={setValue} textareaRef={textareaRef} />
           </PopoverContent>
         </Popover>
 
