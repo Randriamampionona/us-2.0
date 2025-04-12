@@ -29,6 +29,9 @@ import { Edit, SmilePlus } from "lucide-react";
 import { useEditMessage } from "@/store/use-edit-message.store";
 import { setReaction } from "@/action/set-reaction.action";
 import Image from "next/image";
+import { isValidUrl } from "@/utils/link-checker";
+import LinkPreviewer from "./link-preview";
+import { useImagePreview } from "@/store/use-image-preview.store";
 
 type TProps = {
   message: TMessage;
@@ -65,6 +68,7 @@ const reactionEmoji = [
 export default function Message({ message, onDelete }: TProps) {
   const { userId } = useAuth();
   const { setNewMessage } = useEditMessage();
+  const { setImageData } = useImagePreview();
   const reactionRef = useRef<HTMLButtonElement | null>(null);
 
   const isSender = (user_id: string) => {
@@ -157,13 +161,20 @@ export default function Message({ message, onDelete }: TProps) {
           {message.asset && (
             <Image
               src={message.asset.secure_url}
-              alt={message.asset.original_filename}
+              alt={message.asset.original_filename ?? ""}
               width={message.asset.width}
               height={message.asset.height}
+              className="hover:contrast-[.95] cursor-pointer"
+              onClick={(e) => setImageData(message.asset!)}
             />
           )}
+
           {/* message */}
-          <p className="whitespace-pre-line">{message.message}</p>
+          {isValidUrl(message.message) ? (
+            <LinkPreviewer url={message.message} />
+          ) : (
+            <p className="whitespace-pre-line truncate">{message.message}</p>
+          )}
 
           {message.is_seen && message.sender_id == userId && (
             <span className="absolute -bottom-6 te right-0 px-2 text-primary/20 italic">

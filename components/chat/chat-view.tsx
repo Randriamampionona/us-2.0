@@ -12,6 +12,8 @@ import ChatLoading from "./chat-loading";
 import { useInView } from "react-intersection-observer";
 import { setSeen } from "@/action/set-seen.action";
 import { useAuth } from "@clerk/nextjs";
+import ImagePreview from "./image-preview";
+import { useImagePreview } from "@/store/use-image-preview.store";
 
 const CHATCOLECTION =
   process.env.NODE_ENV === "development"
@@ -20,6 +22,7 @@ const CHATCOLECTION =
 
 export default function ChatView() {
   const { userId } = useAuth();
+  const { imageData } = useImagePreview();
   const [messages, setMessages] = useState<TMessages>([]);
   const [loading, setLoading] = useState(true);
   const endOfListRef = useRef<HTMLDivElement | null>(null);
@@ -112,12 +115,15 @@ export default function ChatView() {
   return (
     <>
       {messages.length > 0 ? (
-        <div className="flex-1 w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-fit overflow-y-auto overflow-x-hidden space-y-4 px-2">
-          {messages.map((message) => (
-            <Message key={message.id} message={message} onDelete={onDelete} />
-          ))}
-          <div ref={endOfListRef} className="h-4" />
-        </div>
+        <>
+          {!!imageData && <ImagePreview />}
+          <div className="flex-1 w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-fit overflow-y-auto overflow-x-hidden space-y-4 px-2">
+            {messages.map((message) => (
+              <Message key={message.id} message={message} onDelete={onDelete} />
+            ))}
+            <div ref={endOfListRef} className="h-4" />
+          </div>
+        </>
       ) : (
         <div className="flex-1 flex items-center justify-center w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-fit overflow-y-auto overflow-x-hidden space-y-4 px-2">
           <p className="text-muted-foreground">No Chat yet!</p>

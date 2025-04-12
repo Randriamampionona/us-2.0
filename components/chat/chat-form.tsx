@@ -2,7 +2,7 @@
 
 import { useAuth, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { ImagePlus, Send, SmilePlus } from "lucide-react";
+import { ImagePlus, LoaderCircle, Send, SmilePlus } from "lucide-react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { sendMessage } from "@/action/send-message.action";
 import Emoji from "./emoji";
@@ -16,6 +16,9 @@ import {
 import { TMessageDataToSend } from "@/typing";
 import { uploadAsset } from "@/action/upload-asset.action";
 import { UploadApiResponse } from "cloudinary";
+import UuploadAassetPreview from "./upload-asset-preview";
+import { toastify } from "@/utils/toastify";
+import EditMessageBanner from "./edit-message-banner";
 
 export default function ChatForm() {
   const { userId } = useAuth();
@@ -34,30 +37,40 @@ export default function ChatForm() {
     setValue(e.target.value);
   };
 
+  const onClearAssetPreview = () => {
+    setAsset(null);
+  };
+
   // Handle file input change and generate the preview
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files ? e.target.files[0] : null;
-    if (file) {
+  const handleFileChange = (files: FileList | null) => {
+    if (files && files?.length > 0) {
       // Check if the file is an image
+      const file = files[0];
       if (file.type.startsWith("image/")) {
-        // Check if the file size is less than or equal to 2MB
-        if (file.size <= 2 * 1024 * 1024) {
+        if (file.size <= 20 * 1024 * 1024) {
+          // < 20MB
           const reader = new FileReader();
           reader.onloadend = () => {
             setAsset(reader.result as string); // Set the data URL as preview
           };
           reader.readAsDataURL(file); // Convert file to a data URL
         } else {
-          alert("File size exceeds 2MB. Please select a smaller file.");
+          alert("File size exceeds 20MB. Please select a smaller file.");
         }
+        // Check if the file size is less than or equal to 20MB
       } else {
         alert("Please select a valid image file.");
       }
     }
+
+    // Reset the input so selecting the same file again will trigger onChange
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
   };
 
   const onSend = async () => {
-    if (isPending || !userId || !user || !value.trim()) return;
+    if (isPending || !userId || !user || (!value.trim() && !asset)) return;
 
     setIsPending(true);
 
@@ -66,6 +79,10 @@ export default function ChatForm() {
 
       if (asset) {
         const uploadedAsset = await uploadAsset(asset);
+
+        if (uploadedAsset) {
+          toastify("success", "Image uploaded");
+        }
 
         assetData = uploadedAsset as UploadApiResponse;
       }
@@ -99,8 +116,8 @@ export default function ChatForm() {
       }
 
       await sendMessage(data);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      toastify("error", error.message);
     } finally {
       setIsPending(false);
       setValue("");
@@ -131,33 +148,36 @@ export default function ChatForm() {
   }, [value]);
 
   return (
-    <div className="w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-fit pt-2 space-y-4">
-      {asset && (
-        <div>
-          <img
-            src={asset}
-            alt="Image preview"
-            style={{ maxWidth: "300px", maxHeight: "300px" }} // Adjust the preview size as needed
+    <div className="w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-fit pt-2">
+      <form className="flex items-end justify-between gap-x-2 w-full">
+        <div className="flex-1 space-y-1">
+          {asset && (
+            <UuploadAassetPreview
+              asset={asset}
+              onClear={onClearAssetPreview}
+              isPending={isPending}
+            />
+          )}
+
+          {isOnEdit && <EditMessageBanner setValue={setValue} />}
+
+          <textarea
+            autoFocus
+            spellCheck={false}
+            lang="zxx"
+            autoComplete="off"
+            ref={textareaRef}
+            className="resize-none overflow-y-hidden flex h-10 max-h-80 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+            placeholder="Type your message here."
+            value={value}
+            disabled={isPending}
+            onChange={onChangeFn}
           />
         </div>
-      )}
-      <form className="flex items-end justify-between gap-x-2 w-full">
-        <textarea
-          autoFocus
-          spellCheck={false}
-          lang="zxx"
-          autoComplete="off"
-          ref={textareaRef}
-          className="flex-1 resize-none overflow-y-hidden flex h-10 max-h-80 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-          placeholder="Type your message here."
-          value={value}
-          disabled={isPending}
-          onChange={onChangeFn}
-        />
 
         <Popover>
           <PopoverTrigger asChild>
-            <Button type="button">
+            <Button type="button" size="icon" disabled={isPending}>
               <SmilePlus />
             </Button>
           </PopoverTrigger>
@@ -169,7 +189,8 @@ export default function ChatForm() {
         <div>
           <Button
             type="button"
-            size={"icon"}
+            size="icon"
+            disabled={isPending || isOnEdit}
             onClick={() => inputRef.current?.click()}
           >
             <ImagePlus />
@@ -179,17 +200,17 @@ export default function ChatForm() {
             hidden
             type="file"
             accept="image/*"
-            onChange={handleFileChange}
+            onChange={(e) => handleFileChange(e.target.files)}
           />
         </div>
 
         <Button
           size={"icon"}
           type="submit"
-          disabled={isPending || !value}
+          disabled={isPending || (!value && !asset)}
           onClick={onSend}
         >
-          <Send />
+          {isPending ? <LoaderCircle className="animate-spin" /> : <Send />}
         </Button>
       </form>
     </div>
