@@ -1,4 +1,5 @@
 import { Timestamp } from "firebase-admin/firestore";
+import { UploadApiResponse } from "cloudinary";
 
 type TReaction = {
   reactor_id: string;
@@ -12,6 +13,7 @@ type TMessageDataToSend = {
   reaction: TReaction;
   is_seen: boolean;
   is_deleted: boolean;
+  asset?: UploadApiResponse;
 };
 
 type TMessage = {
@@ -24,6 +26,7 @@ type TMessage = {
   reaction: TReaction;
   is_seen: boolean;
   is_deleted: boolean;
+  asset?: UploadApiResponse;
 };
 
 type TMessages = Message[];

@@ -28,6 +28,7 @@ import { useRef } from "react";
 import { Edit, SmilePlus } from "lucide-react";
 import { useEditMessage } from "@/store/use-edit-message.store";
 import { setReaction } from "@/action/set-reaction.action";
+import Image from "next/image";
 
 type TProps = {
   message: TMessage;
@@ -152,6 +153,15 @@ export default function Message({ message, onDelete }: TProps) {
             </TooltipProvider>
           )}
 
+          {/* asset */}
+          {message.asset && (
+            <Image
+              src={message.asset.secure_url}
+              alt={message.asset.original_filename}
+              width={message.asset.width}
+              height={message.asset.height}
+            />
+          )}
           {/* message */}
           <p className="whitespace-pre-line">{message.message}</p>
 
