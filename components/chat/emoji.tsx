@@ -1,5 +1,6 @@
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
+import { useTheme } from "next-themes";
 
 import { Dispatch, RefObject, SetStateAction } from "react";
 
@@ -21,6 +22,8 @@ type EmojiMartEmoji = {
 };
 
 export default function Emoji({ setValue, textareaRef }: TProps) {
+  const { theme } = useTheme();
+
   const appendEmoji = (emoji: EmojiMartEmoji) => {
     const textarea = textareaRef.current;
     if (textarea) {
@@ -53,5 +56,7 @@ export default function Emoji({ setValue, textareaRef }: TProps) {
     }
   };
 
-  return <Picker theme="light" data={data} onEmojiSelect={appendEmoji} />;
+  return (
+    <Picker theme={theme ?? "light"} data={data} onEmojiSelect={appendEmoji} />
+  );
 }

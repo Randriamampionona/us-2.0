@@ -51,7 +51,7 @@ export default function GiftButton() {
     <div className="w-full flex items-center justify-center mt-6">
       <Button
         size="lg"
-        className="rounded-lg font-bold bg-loveRose shadow-2xl shadow-loveRose hover:bg-loveRose/75"
+        className="rounded-lg text-white font-bold bg-loveRose shadow-2xl shadow-loveRose hover:bg-loveRose/75"
         onClick={onClick}
         disabled={isPending || timer > 0}
       >

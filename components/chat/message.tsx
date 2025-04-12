@@ -116,8 +116,8 @@ export default function Message({ message, onDelete }: TProps) {
           className={cn(
             "relative px-4 py-3 rounded-md w-fit max-w-[calc(100%-3rem)] md:max-w-[calc(100%-7rem)] lg:max-w-[calc(100%-13rem)]",
             isSender(message.sender_id)
-              ? "bg-loveRose text-primary-foreground ml-auto rounded-br-none"
-              : "bg-gray-200 rounded-bl-none",
+              ? "bg-loveRose text-primary-foreground dark:text-foreground ml-auto rounded-br-none"
+              : "bg-gray-200 dark:text-background rounded-bl-none",
             (!!message.reaction || message.is_seen) && "!mb-8"
           )}
         >
@@ -152,7 +152,9 @@ export default function Message({ message, onDelete }: TProps) {
             </TooltipProvider>
           )}
 
+          {/* message */}
           <p className="whitespace-pre-line">{message.message}</p>
+
           {message.is_seen && message.sender_id == userId && (
             <span className="absolute -bottom-6 te right-0 px-2 text-primary/20 italic">
               seen
