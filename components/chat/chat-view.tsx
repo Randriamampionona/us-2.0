@@ -27,6 +27,7 @@ export default function ChatView() {
   const [loading, setLoading] = useState(true);
   const endOfListRef = useRef<HTMLDivElement | null>(null);
   const [trigger, setTrigger] = useState(false);
+  const [openPreview, setOpenPreview] = useState(false);
 
   const { ref, inView } = useInView({
     threshold: 0,
@@ -116,10 +117,17 @@ export default function ChatView() {
     <>
       {messages.length > 0 ? (
         <>
-          {!!imageData && <ImagePreview />}
+          {!!imageData && (
+            <ImagePreview open={openPreview} setOpen={setOpenPreview} />
+          )}
           <div className="flex-1 w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-fit overflow-y-auto overflow-x-hidden space-y-4 px-2">
             {messages.map((message) => (
-              <Message key={message.id} message={message} onDelete={onDelete} />
+              <Message
+                key={message.id}
+                message={message}
+                onDelete={onDelete}
+                setOpenPreview={setOpenPreview}
+              />
             ))}
             <div ref={endOfListRef} className="h-4" />
           </div>

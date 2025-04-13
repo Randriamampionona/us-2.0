@@ -24,7 +24,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { ReactionBarSelector } from "@charkour/react-reactions";
 
-import { useRef } from "react";
+import { Dispatch, SetStateAction, useRef } from "react";
 import { Edit, SmilePlus } from "lucide-react";
 import { useEditMessage } from "@/store/use-edit-message.store";
 import { setReaction } from "@/action/set-reaction.action";
@@ -36,6 +36,7 @@ import { useImagePreview } from "@/store/use-image-preview.store";
 type TProps = {
   message: TMessage;
   onDelete: (messageID: string) => Promise<void>;
+  setOpenPreview: Dispatch<SetStateAction<boolean>>;
 };
 
 const reactionEmoji = [
@@ -65,7 +66,7 @@ const reactionEmoji = [
   },
 ];
 
-export default function Message({ message, onDelete }: TProps) {
+export default function Message({ message, onDelete, setOpenPreview }: TProps) {
   const { userId } = useAuth();
   const { setNewMessage } = useEditMessage();
   const { setImageData } = useImagePreview();
@@ -165,7 +166,10 @@ export default function Message({ message, onDelete }: TProps) {
               width={message.asset.width}
               height={message.asset.height}
               className="hover:contrast-[.95] cursor-pointer"
-              onClick={(e) => setImageData(message.asset!)}
+              onClick={() => {
+                setImageData(message.asset!);
+                setOpenPreview(true);
+              }}
             />
           )}
 

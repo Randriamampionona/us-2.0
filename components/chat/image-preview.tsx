@@ -1,20 +1,28 @@
 import { useImagePreview } from "@/store/use-image-preview.store";
-import Image from "next/image";
+import { Dispatch, SetStateAction } from "react";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
+import Download from "yet-another-react-lightbox/plugins/download";
 
-export default function ImagePreview() {
+type TProps = {
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+};
+
+export default function ImagePreview({ open, setOpen }: TProps) {
   const { imageData, reset } = useImagePreview();
+
+  const onClose = () => {
+    setOpen(false);
+    reset();
+  };
+
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center bg-black/45 backdrop-blur w-screen h-dvh md:h-screen overflow-auto z-50"
-      onClick={reset}
-    >
-      <Image
-        src={imageData?.secure_url!}
-        alt=""
-        width={imageData?.width}
-        height={imageData?.height}
-        onClick={(e) => e.stopPropagation()}
-      />
-    </div>
+    <Lightbox
+      open={open}
+      close={onClose}
+      slides={[{ src: imageData?.secure_url! }]}
+      plugins={[Download]}
+    />
   );
 }
