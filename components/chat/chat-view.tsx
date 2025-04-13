@@ -46,6 +46,7 @@ export default function ChatView() {
     }
   };
 
+  // listen to messages
   useEffect(() => {
     const q = query(
       collection(db, CHATCOLECTION), // Specify the collection

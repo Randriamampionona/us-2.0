@@ -19,6 +19,23 @@ import { UploadApiResponse } from "cloudinary";
 import UuploadAassetPreview from "./upload-asset-preview";
 import { toastify } from "@/utils/toastify";
 import EditMessageBanner from "./edit-message-banner";
+import {
+  collection,
+  doc,
+  onSnapshot,
+  query,
+  setDoc,
+  where,
+} from "firebase/firestore";
+import { db } from "@/firebase";
+import TypingBubble from "./typing-bubble";
+
+type TTypingUser = {
+  user_id: string;
+  active: boolean;
+  typing: boolean;
+  username: string;
+};
 
 export default function ChatForm() {
   const { userId } = useAuth();
@@ -28,6 +45,10 @@ export default function ChatForm() {
   const [value, setValue] = useState("");
   const [isPending, setIsPending] = useState(false);
   const [asset, setAsset] = useState<string | null>(null);
+  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
+    null
+  );
+  const [typingUser, setTypingUser] = useState<TTypingUser | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -35,6 +56,29 @@ export default function ChatForm() {
 
   const onChangeFn = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setValue(e.target.value);
+
+    if (!userId) return;
+
+    setDoc(
+      doc(db, "USERS", userId),
+      {
+        typing: true,
+      },
+      { merge: true }
+    );
+
+    if (typingTimeout) clearTimeout(typingTimeout);
+    const timeout = setTimeout(() => {
+      setDoc(
+        doc(db, "USERS", userId),
+        {
+          typing: false,
+        },
+        { merge: true }
+      );
+    }, 2000);
+
+    setTypingTimeout(timeout);
   };
 
   const onClearAssetPreview = () => {
@@ -147,6 +191,24 @@ export default function ChatForm() {
     }
   }, [value]);
 
+  // listen to typing
+  useEffect(() => {
+    const q = query(collection(db, "USERS"), where("typing", "==", true));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const typingUsers = snapshot.docs
+        .filter((doc) => doc.id !== userId) // exclude yourself
+        .map((doc) => ({
+          user_id: doc.id,
+          ...doc.data(),
+        })) as TTypingUser[];
+
+      setTypingUser(typingUsers[0]);
+    });
+
+    return () => unsubscribe(); // cleanup listener
+  }, [userId]);
+
   return (
     <div className="w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-fit pt-2">
       <form className="flex items-end justify-between gap-x-2 w-full">
@@ -160,6 +222,10 @@ export default function ChatForm() {
           )}
 
           {isOnEdit && <EditMessageBanner setValue={setValue} />}
+
+          {!!typingUser && typingUser.typing && (
+            <TypingBubble username={typingUser.username} />
+          )}
 
           <textarea
             autoFocus
