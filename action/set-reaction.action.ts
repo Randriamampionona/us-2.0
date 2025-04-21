@@ -1,6 +1,7 @@
 import { db } from "@/firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { CHATCOLECTION_DEV, CHATCOLECTION_PROD } from "@/constant";
+import { TReaction } from "@/typing";
 
 const CHATCOLECTION =
   process.env.NODE_ENV === "development"
@@ -9,10 +10,7 @@ const CHATCOLECTION =
 
 type TData = {
   message_id: string;
-  reactionData: {
-    reactor_id: string;
-    reaction: string;
-  } | null;
+  reactionData: TReaction;
 };
 
 export async function setReaction({ message_id, reactionData }: TData) {

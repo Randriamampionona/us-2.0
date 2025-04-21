@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
-import { TMessage } from "@/typing";
+import { TMessage, TReaction } from "@/typing";
 import { formatTimeAgo } from "@/utils/format-timeago";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 
 import {
   DropdownMenu,
@@ -24,7 +24,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { ReactionBarSelector } from "@charkour/react-reactions";
 
-import { Dispatch, SetStateAction, useRef } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef } from "react";
 import { Edit, SmilePlus } from "lucide-react";
 import { useEditMessage } from "@/store/use-edit-message.store";
 import { setReaction } from "@/action/set-reaction.action";
@@ -32,6 +32,7 @@ import Image from "next/image";
 import { isValidUrl } from "@/utils/link-checker";
 import LinkPreviewer from "./link-preview";
 import { useImagePreview } from "@/store/use-image-preview.store";
+import { isSingleEmoji } from "@/utils/emoji-checker";
 
 type TProps = {
   message: TMessage;
@@ -68,6 +69,8 @@ const reactionEmoji = [
 
 export default function Message({ message, onDelete, setOpenPreview }: TProps) {
   const { userId } = useAuth();
+  const { user } = useUser();
+
   const { setNewMessage } = useEditMessage();
   const { setImageData } = useImagePreview();
   const reactionRef = useRef<HTMLButtonElement | null>(null);
@@ -83,11 +86,9 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
   ) => {
     if (!userId) return;
 
-    const reactionData: {
-      reactor_id: string;
-      reaction: string;
-    } | null = {
+    const reactionData: TReaction = {
       reactor_id: userId,
+      reactor_username: user?.firstName!,
       reaction,
     };
 
@@ -124,7 +125,8 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
             isSender(message.sender_id)
               ? "bg-loveRose text-primary-foreground dark:text-foreground ml-auto rounded-br-none"
               : "bg-gray-200 dark:text-background rounded-bl-none",
-            (!!message.reaction || message.is_seen) && "!mb-8"
+            (!!message.reaction || message.is_seen) && "!mb-8",
+            isSingleEmoji(message.message) && "bg-transparent"
           )}
         >
           {!!message.reaction && (
@@ -151,7 +153,9 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>
-                    {message.sender_id != userId ? "You" : message.username}
+                    {message.sender_id != userId
+                      ? "You"
+                      : message.reaction.reactor_username}
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -177,7 +181,15 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
           {isValidUrl(message.message) ? (
             <LinkPreviewer url={message.message} />
           ) : (
-            <p className="whitespace-pre-line truncate">{message.message}</p>
+            <p
+              className={cn(
+                "whitespace-pre-line",
+                isSingleEmoji(message.message) && "text-6xl",
+                !isSingleEmoji(message.message) && "truncate"
+              )}
+            >
+              {message.message}
+            </p>
           )}
 
           {message.is_seen && message.sender_id == userId && (
@@ -213,30 +225,26 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Popover>
-              <PopoverTrigger asChild ref={reactionRef}>
-                <span className="absolute top-0 -right-5 text-primary/20 hover:text-primary">
-                  <SmilePlus size={16} />
-                </span>
-              </PopoverTrigger>
-              <PopoverContent
-                className="relative w-auto p-0 bg-transparent"
-                align="center"
-              >
-                <ReactionBarSelector
-                  iconSize={17}
-                  style={{
-                    position: "absolute",
-                    top: "-3.5rem",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                  }}
-                  onSelect={(reaction) =>
-                    onChangeReaction(reaction, message.id, "set")
-                  }
-                />
-              </PopoverContent>
-            </Popover>
+            !isSingleEmoji(message.message) && (
+              <Popover>
+                <PopoverTrigger asChild ref={reactionRef}>
+                  <span className="absolute top-0 -right-5 text-primary/20 hover:text-primary">
+                    <SmilePlus size={16} />
+                  </span>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="relative w-auto p-0 bg-transparent rounded-full border-none shadow"
+                  align="center"
+                >
+                  <ReactionBarSelector
+                    iconSize={17}
+                    onSelect={(reaction) =>
+                      onChangeReaction(reaction, message.id, "set")
+                    }
+                  />
+                </PopoverContent>
+              </Popover>
+            )
           )}
         </div>
       )}

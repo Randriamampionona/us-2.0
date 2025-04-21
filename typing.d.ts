@@ -3,6 +3,7 @@ import { UploadApiResponse } from "cloudinary";
 
 type TReaction = {
   reactor_id: string;
+  reactor_username: string;
   reaction: string;
 } | null;
 
