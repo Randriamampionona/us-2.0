@@ -1,4 +1,5 @@
 export function isSingleEmoji(text: string): boolean {
-  const emojiSequenceRegex = /^(\p{Extended_Pictographic}(?:\u200D\p{Extended_Pictographic})*)$/u;
-  return emojiSequenceRegex.test(text);
+  const emojiRegex =
+    /^((\p{Emoji}(?:\uFE0F)?)(\u200D(\p{Emoji}(?:\uFE0F)?))*)$/u;
+  return emojiRegex.test(text);
 }
