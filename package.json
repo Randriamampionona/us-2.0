@@ -34,6 +34,7 @@
     "react-text-transition": "^3.1.0",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
+    "web-push": "^3.6.7",
     "yet-another-react-lightbox": "^3.22.0",
     "zustand": "^5.0.3"
   },
@@ -41,6 +42,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/web-push": "^3.6.4",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
     "postcss": "^8",

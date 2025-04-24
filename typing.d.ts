@@ -31,3 +31,17 @@ type TMessage = {
 };
 
 type TMessages = Message[];
+
+type TUser = {
+  id: string;
+  username: string;
+  active: true;
+  typing: false;
+  subscription?: {
+    endpoint: string;
+    keys: {
+      auth: string;
+      p256dh: string;
+    };
+  };
+};
