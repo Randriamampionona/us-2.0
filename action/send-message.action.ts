@@ -61,7 +61,7 @@ export async function sendMessage(data: TMessageDataToSend) {
       title,
       body,
       icon: "https://us-2-0.vercel.app/favicon.ico",
-      tag: "chat-notification",
+      //tag: "chat-notification",
     });
 
     try {
