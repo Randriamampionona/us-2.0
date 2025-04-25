@@ -4,7 +4,7 @@ self.addEventListener("push", function (event) {
     self.registration.showNotification(data.title, {
       body: data.body,
       icon: "https://us-2-0.vercel.app/favicon.ico",
-      tag: "chat-notification",
+      //tag: "chat-notification",
     })
   );
 });
