@@ -29,6 +29,12 @@ import {
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import TypingBubble from "./typing-bubble";
+import { USERCOLECTION_DEV, USERCOLECTION_PROD } from "@/constant";
+
+const USERCOLECTION =
+  process.env.NODE_ENV === "development"
+    ? USERCOLECTION_DEV
+    : USERCOLECTION_PROD;
 
 type TTypingUser = {
   user_id: string;
@@ -60,7 +66,7 @@ export default function ChatForm() {
     if (!userId) return;
 
     setDoc(
-      doc(db, "USERS", userId),
+      doc(db, USERCOLECTION, userId),
       {
         typing: true,
       },
@@ -70,7 +76,7 @@ export default function ChatForm() {
     if (typingTimeout) clearTimeout(typingTimeout);
     const timeout = setTimeout(() => {
       setDoc(
-        doc(db, "USERS", userId),
+        doc(db, USERCOLECTION, userId),
         {
           typing: false,
         },
@@ -193,7 +199,7 @@ export default function ChatForm() {
 
   // listen to typing
   useEffect(() => {
-    const q = query(collection(db, "USERS"), where("typing", "==", true));
+    const q = query(collection(db, USERCOLECTION), where("typing", "==", true));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const typingUsers = snapshot.docs

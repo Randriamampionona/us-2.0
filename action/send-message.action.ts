@@ -8,13 +8,23 @@ import {
   serverTimestamp,
   getDocs,
 } from "firebase/firestore";
-import { CHATCOLECTION_DEV, CHATCOLECTION_PROD } from "@/constant";
+import {
+  CHATCOLECTION_DEV,
+  CHATCOLECTION_PROD,
+  USERCOLECTION_DEV,
+  USERCOLECTION_PROD,
+} from "@/constant";
 import webpush from "@/lib/webPush";
 
 const CHATCOLECTION =
   process.env.NODE_ENV === "development"
     ? CHATCOLECTION_DEV
     : CHATCOLECTION_PROD;
+
+const USERCOLECTION =
+  process.env.NODE_ENV === "development"
+    ? USERCOLECTION_DEV
+    : USERCOLECTION_PROD;
 
 export async function sendMessage(data: TMessageDataToSend) {
   try {
@@ -25,7 +35,7 @@ export async function sendMessage(data: TMessageDataToSend) {
     });
 
     // 2. Get all users EXCEPT the sender
-    const usersSnapshot = await getDocs(collection(db, "USERS"));
+    const usersSnapshot = await getDocs(collection(db, USERCOLECTION));
     const recipients: TUser[] = usersSnapshot.docs
       .filter((doc) => doc.id !== data.sender_id)
       .map((doc) => {
