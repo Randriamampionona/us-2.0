@@ -2,7 +2,13 @@
 
 import { useAuth, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { ImagePlus, LoaderCircle, Send, SmilePlus } from "lucide-react";
+import {
+  Camera,
+  ImagePlay,
+  LoaderCircle,
+  SendHorizonal,
+  SmilePlus,
+} from "lucide-react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { sendMessage } from "@/action/send-message.action";
 import Emoji from "./emoji";
@@ -30,6 +36,7 @@ import {
 import { db } from "@/firebase";
 import TypingBubble from "./typing-bubble";
 import { USERCOLECTION_DEV, USERCOLECTION_PROD } from "@/constant";
+import { cn } from "@/lib/utils";
 
 const USERCOLECTION =
   process.env.NODE_ENV === "development"
@@ -216,74 +223,104 @@ export default function ChatForm() {
   }, [userId]);
 
   return (
-    <div className="w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-fit pt-2">
-      <form className="flex items-end justify-between gap-x-2 w-full">
+    <div className="w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-fit pt-2 space-y-1">
+      {/* typing indicator */}
+      {!!typingUser && typingUser.typing && (
+        <TypingBubble username={typingUser.username} />
+      )}
+
+      {/* asset preview */}
+      {asset && (
+        <UuploadAassetPreview
+          asset={asset}
+          onClear={onClearAssetPreview}
+          isPending={isPending}
+        />
+      )}
+
+      {/* edit banna indicator */}
+      {isOnEdit && <EditMessageBanner setValue={setValue} />}
+
+      <form
+        className={cn(
+          "w-full bg-card-foreground/5 border rounded-md",
+          isPending && "opacity-50"
+        )}
+      >
         <div className="flex-1 space-y-1">
-          {asset && (
-            <UuploadAassetPreview
-              asset={asset}
-              onClear={onClearAssetPreview}
-              isPending={isPending}
-            />
-          )}
-
-          {isOnEdit && <EditMessageBanner setValue={setValue} />}
-
-          {!!typingUser && typingUser.typing && (
-            <TypingBubble username={typingUser.username} />
-          )}
-
+          {/* input */}
           <textarea
             autoFocus
             spellCheck={false}
             lang="zxx"
             autoComplete="off"
             ref={textareaRef}
-            className="resize-none overflow-y-hidden flex h-10 max-h-80 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-            placeholder="Type your message here."
+            className="resize-none overflow-y-hidden flex h-10 max-h-64 w-full rounded-none border-none border-input bg-transparent px-3 py-2 text-base file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 md:text-sm outline-none ring-0 focus-visible:ring-0 focus-visible:outline-none shadow-none"
+            placeholder="Message"
             value={value}
             disabled={isPending}
             onChange={onChangeFn}
           />
         </div>
 
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button type="button" size="icon" disabled={isPending}>
-              <SmilePlus />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="end">
-            <Emoji setValue={setValue} textareaRef={textareaRef} />
-          </PopoverContent>
-        </Popover>
+        <div className="flex items-center justify-end space-x-4 divide-x-2 p-2 pr-4">
+          <div className="flex items-center space-x-4">
+            {/* emoji btn */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  disabled={isPending}
+                  className="opacity-65"
+                >
+                  <SmilePlus size={20} />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Emoji setValue={setValue} textareaRef={textareaRef} />
+              </PopoverContent>
+            </Popover>
 
-        <div>
-          <Button
-            type="button"
-            size="icon"
-            disabled={isPending || isOnEdit}
-            onClick={() => inputRef.current?.click()}
+            {/* gif btn */}
+            <button type="button" className="opacity-65">
+              <ImagePlay size={20} />
+            </button>
+
+            {/* asset btn */}
+            <>
+              <button
+                type="button"
+                className="opacity-65"
+                disabled={isPending || isOnEdit}
+                onClick={() => inputRef.current?.click()}
+              >
+                <Camera size={20} />
+              </button>
+              <input
+                ref={inputRef}
+                hidden
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleFileChange(e.target.files)}
+                className="hidden"
+              />
+            </>
+          </div>
+
+          {/* send btn */}
+          <button
+            type="submit"
+            disabled={isPending || (!value && !asset)}
+            onClick={onSend}
+            className="pl-4 opacity-65"
           >
-            <ImagePlus />
-          </Button>
-          <input
-            ref={inputRef}
-            hidden
-            type="file"
-            accept="image/*"
-            onChange={(e) => handleFileChange(e.target.files)}
-          />
+            {isPending ? (
+              <LoaderCircle className="animate-spin" />
+            ) : (
+              <SendHorizonal size={20} />
+            )}
+          </button>
         </div>
-
-        <Button
-          size={"icon"}
-          type="submit"
-          disabled={isPending || (!value && !asset)}
-          onClick={onSend}
-        >
-          {isPending ? <LoaderCircle className="animate-spin" /> : <Send />}
-        </Button>
       </form>
     </div>
   );
