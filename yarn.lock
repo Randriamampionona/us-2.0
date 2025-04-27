@@ -2612,6 +2612,11 @@ get-tsconfig@^4.10.0:
   dependencies:
     resolve-pkg-maps "^1.0.0"
 
+gif-picker-react@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/gif-picker-react/-/gif-picker-react-1.4.0.tgz#f63bd8870d27c548d7beb73bf242e218ba4581b8"
+  integrity sha512-e48u077ldBiMoPS4NZ+3noW9aJCLMYMQqcx4xdcaGJdONVXCWNxw3bJ0MF2X5xO6fJXHY4IA9vD4/pdswMrorA==
+
 glob-parent@^5.1.2, glob-parent@~5.1.2:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/glob-parent/-/glob-parent-5.1.2.tgz#869832c58034fe68a4093c17dc15e8340d8401c4"

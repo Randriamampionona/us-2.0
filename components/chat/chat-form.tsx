@@ -37,6 +37,7 @@ import { db } from "@/firebase";
 import TypingBubble from "./typing-bubble";
 import { USERCOLECTION_DEV, USERCOLECTION_PROD } from "@/constant";
 import { cn } from "@/lib/utils";
+import Gif from "./gif";
 
 const USERCOLECTION =
   process.env.NODE_ENV === "development"
@@ -56,8 +57,9 @@ export default function ChatForm() {
 
   const { message_id, message, reset } = useEditMessage();
   const [value, setValue] = useState("");
-  const [isPending, setIsPending] = useState(false);
   const [asset, setAsset] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState(false);
+  const [isGifOpen, setIsGifOpen] = useState(false);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
@@ -282,9 +284,23 @@ export default function ChatForm() {
             </Popover>
 
             {/* gif btn */}
-            <button type="button" className="opacity-65">
-              <ImagePlay size={20} />
-            </button>
+            <Popover
+              open={isGifOpen}
+              onOpenChange={(open) => setIsGifOpen(open)}
+            >
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="opacity-65"
+                  disabled={isPending}
+                >
+                  <ImagePlay size={20} />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Gif setIsPending={setIsPending} setIsGifOpen={setIsGifOpen} />
+              </PopoverContent>
+            </Popover>
 
             {/* asset btn */}
             <>

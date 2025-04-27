@@ -126,7 +126,8 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
               ? "bg-loveRose text-primary-foreground dark:text-foreground ml-auto rounded-br-none"
               : "bg-gray-200 dark:text-background rounded-bl-none",
             (!!message.reaction || message.is_seen) && "!mb-8",
-            isSingleEmoji(message.message) && "bg-transparent"
+            isSingleEmoji(message.message) && "bg-transparent",
+            !!message.gif && "bg-transparent p-0"
           )}
         >
           {!!message.reaction && (
@@ -177,6 +178,16 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
             />
           )}
 
+          {/* git */}
+          {message.gif && (
+            <Image
+              src={message.gif.url}
+              alt={message.gif.description ?? ""}
+              width={message.gif.width}
+              height={message.gif.height}
+            />
+          )}
+
           {/* message */}
           {isValidUrl(message.message) ? (
             <LinkPreviewer url={message.message} />
@@ -199,11 +210,15 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
           )}
 
           {!!message?.editedAt ? (
-            <span className="text-[0.7rem] font-light text-nowrap opacity-40">
+            <span
+              className={cn("text-[0.7rem] font-light text-nowrap opacity-40")}
+            >
               Edited {formatTimeAgo(message.editedAt)}
             </span>
           ) : (
-            <span className="text-[0.7rem] font-light text-nowrap opacity-40">
+            <span
+              className={cn("text-[0.7rem] font-light text-nowrap opacity-40")}
+            >
               Sent {formatTimeAgo(message.timestamp)}
             </span>
           )}

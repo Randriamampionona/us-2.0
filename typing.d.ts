@@ -1,5 +1,6 @@
 import { Timestamp } from "firebase-admin/firestore";
 import { UploadApiResponse } from "cloudinary";
+import { TenorImage } from "gif-picker-react";
 
 type TReaction = {
   reactor_id: string;
@@ -15,6 +16,7 @@ type TMessageDataToSend = {
   is_seen: boolean;
   is_deleted: boolean;
   asset?: UploadApiResponse;
+  gif?: TenorImage;
 };
 
 type TMessage = {
@@ -28,6 +30,7 @@ type TMessage = {
   is_seen: boolean;
   is_deleted: boolean;
   asset?: UploadApiResponse;
+  gif?: TenorImage;
 };
 
 type TMessages = Message[];
