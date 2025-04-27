@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@charkour/react-reactions": "^0.11.0",
     "@clerk/nextjs": "^6.13.0",
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",

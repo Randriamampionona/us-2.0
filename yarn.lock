@@ -7,11 +7,6 @@
   resolved "https://registry.yarnpkg.com/@alloc/quick-lru/-/quick-lru-5.2.0.tgz#7bf68b20c0a350f936915fcae06f58e32007ce30"
   integrity sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==
 
-"@charkour/react-reactions@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@charkour/react-reactions/-/react-reactions-0.11.0.tgz#cde3614de5a954ee733c0d8c855be473ad003e7c"
-  integrity sha512-a1AnfUzZ1jZZUvMI8w4D8EfwMohByKhW6RTnY4xQ1VFwNfYbcVbRT6MUO7Gkk9Q+LqyVsNNW9fU9rG58hOvGmg==
-
 "@clerk/backend@^1.26.0":
   version "1.26.0"
   resolved "https://registry.yarnpkg.com/@clerk/backend/-/backend-1.26.0.tgz#2bd2d5264b7e9b69a8b9a7666ba5e1f1e2365081"

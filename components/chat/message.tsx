@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { TMessage, TReaction } from "@/typing";
 import { formatTimeAgo } from "@/utils/format-timeago";
 import { useAuth, useUser } from "@clerk/nextjs";
+import { Dispatch, SetStateAction, useState } from "react";
 
 import {
   DropdownMenu,
@@ -21,11 +22,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import Picker from "@emoji-mart/react";
 import { Badge } from "@/components/ui/badge";
-
-import { ReactionBarSelector } from "@charkour/react-reactions";
-
-import { Dispatch, SetStateAction, useState } from "react";
 import { Edit, SmilePlus } from "lucide-react";
 import { useEditMessage } from "@/store/use-edit-message.store";
 import { setReaction } from "@/action/set-reaction.action";
@@ -34,6 +32,7 @@ import { isValidUrl } from "@/utils/link-checker";
 import LinkPreviewer from "./link-preview";
 import { useImagePreview } from "@/store/use-image-preview.store";
 import { isSingleEmoji } from "@/utils/emoji-checker";
+import { useTheme } from "next-themes";
 
 type TProps = {
   message: TMessage;
@@ -41,38 +40,21 @@ type TProps = {
   setOpenPreview: Dispatch<SetStateAction<boolean>>;
 };
 
-const reactionEmoji = [
-  {
-    key: "satisfaction",
-    value: "👍",
-  },
-  {
-    key: "love",
-    value: "❤️",
-  },
-  {
-    key: "happy",
-    value: "😆",
-  },
-  {
-    key: "surprise",
-    value: "😮",
-  },
-  {
-    key: "sad",
-    value: "😢",
-  },
-  {
-    key: "angry",
-    value: "😡",
-  },
-];
+type Reaction = {
+  id: string;
+  name: string;
+  native: string;
+  unified: string;
+  keywords: string[];
+  shortcodes: string;
+};
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Message({ message, onDelete, setOpenPreview }: TProps) {
   const { userId } = useAuth();
   const { user } = useUser();
+  const { theme } = useTheme();
 
   const { setNewMessage } = useEditMessage();
   const { setImageData } = useImagePreview();
@@ -183,11 +165,7 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
                       onChangeReaction("", message.id, "remove")
                     }
                   >
-                    {
-                      reactionEmoji.find(
-                        (rct) => rct.key == message.reaction?.reaction
-                      )?.value
-                    }
+                    {message.reaction?.reaction}
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -242,12 +220,14 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
             </p>
           )}
 
+          {/* seen */}
           {message.is_seen && message.sender_id == userId && (
             <span className="absolute -bottom-6 te right-0 px-2 text-primary/20 italic">
               seen
             </span>
           )}
 
+          {/* date */}
           {!!message?.editedAt ? (
             <span
               className={cn(
@@ -305,14 +285,11 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
                     <SmilePlus size={16} />
                   </span>
                 </PopoverTrigger>
-                <PopoverContent
-                  className="relative w-auto p-0 bg-transparent rounded-full border-none shadow -top-14"
-                  align="center"
-                >
-                  <ReactionBarSelector
-                    iconSize={17}
-                    onSelect={(reaction) =>
-                      onChangeReaction(reaction, message.id, "set")
+                <PopoverContent className="w-auto p-0" align="end">
+                  <Picker
+                    theme={theme ?? "light"}
+                    onEmojiSelect={(reaction: Reaction) =>
+                      onChangeReaction(reaction.native, message.id, "set")
                     }
                   />
                 </PopoverContent>
