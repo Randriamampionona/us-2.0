@@ -1,3 +1,4 @@
+import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { TMessage, TReaction } from "@/typing";
 import { formatTimeAgo } from "@/utils/format-timeago";
@@ -24,7 +25,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { ReactionBarSelector } from "@charkour/react-reactions";
 
-import { Dispatch, SetStateAction, useEffect, useRef } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Edit, SmilePlus } from "lucide-react";
 import { useEditMessage } from "@/store/use-edit-message.store";
 import { setReaction } from "@/action/set-reaction.action";
@@ -67,13 +68,15 @@ const reactionEmoji = [
   },
 ];
 
+const inter = Inter({ subsets: ["latin"] });
+
 export default function Message({ message, onDelete, setOpenPreview }: TProps) {
   const { userId } = useAuth();
   const { user } = useUser();
 
   const { setNewMessage } = useEditMessage();
   const { setImageData } = useImagePreview();
-  const reactionRef = useRef<HTMLButtonElement | null>(null);
+  const [isRectionOpen, setIsRectionOpen] = useState(false);
 
   const isSender = (user_id: string) => {
     return userId == user_id;
@@ -101,9 +104,43 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
       console.log(error);
     } finally {
       if (key === "set") {
-        reactionRef.current?.click();
+        setIsRectionOpen(false);
       }
     }
+  };
+
+  const messageUX = {
+    hasSeenOrReaction: !!message.reaction || !!message.is_seen,
+    hasAsset: !!message.asset && !message.message,
+    hasGif: !!message.gif && !message.message,
+    receiverOnlyEmoji:
+      !isSender(message.sender_id) && isSingleEmoji(message.message),
+    receiverOnlyAsset:
+      !isSender(message.sender_id) && message.asset && !message.message,
+    receiverOnlyGif:
+      !isSender(message.sender_id) && message.gif && !message.message,
+  };
+
+  const messageUI = {
+    default: {
+      sender:
+        "relative px-4 py-3 rounded-md w-fit max-w-[calc(100%-3rem)] md:max-w-[calc(100%-7rem)] lg:max-w-[calc(100%-13rem)] bg-loveRose text-primary-foreground dark:text-foreground ml-auto rounded-br-none",
+      receiver:
+        "relative px-4 py-3 rounded-md w-fit max-w-[calc(100%-3rem)] md:max-w-[calc(100%-7rem)] lg:max-w-[calc(100%-13rem)] bg-gray-200 dark:text-background rounded-bl-none",
+    },
+    emoji: {
+      default: "bg-transparent p-0",
+      receiver: "!text-foreground",
+    },
+    assets: {
+      default: "bg-transparent p-0",
+      receiver: "!text-foreground",
+    },
+    gif: {
+      default: "bg-transparent p-0",
+      receiver: "!text-foreground",
+    },
+    hasSeenOrReaction: "",
   };
 
   return (
@@ -111,7 +148,7 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
       {message.is_deleted ? (
         <p
           className={cn(
-            "px-4 py-3 border border-muted-foreground text-muted-foreground opacity-50 italic select-none cursor-default rounded-md w-fit max-w-[calc(100%-3rem)] md:max-w-[calc(100%-7rem)] lg:max-w-[calc(100%-13rem)]",
+            "px-4 py-3 mb-14 border border-muted-foreground text-muted-foreground opacity-50 italic select-none cursor-default rounded-md w-fit max-w-[calc(100%-3rem)] md:max-w-[calc(100%-7rem)] lg:max-w-[calc(100%-13rem)]",
             isSender(message.sender_id) && "ml-auto"
           )}
         >
@@ -121,13 +158,14 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
       ) : (
         <div
           className={cn(
-            "relative px-4 py-3 rounded-md w-fit max-w-[calc(100%-3rem)] md:max-w-[calc(100%-7rem)] lg:max-w-[calc(100%-13rem)]",
+            "mb-14",
             isSender(message.sender_id)
-              ? "bg-loveRose text-primary-foreground dark:text-foreground ml-auto rounded-br-none"
-              : "bg-gray-200 dark:text-background rounded-bl-none",
-            (!!message.reaction || message.is_seen) && "!mb-8",
-            isSingleEmoji(message.message) && "bg-transparent",
-            !!message.gif && "bg-transparent p-0"
+              ? messageUI.default.sender
+              : messageUI.default.receiver,
+            messageUX.hasSeenOrReaction && messageUI.hasSeenOrReaction,
+            isSingleEmoji(message.message) && messageUI.emoji.default,
+            messageUX.hasAsset && messageUI.assets.default,
+            messageUX.hasGif && messageUI.gif.default
           )}
         >
           {!!message.reaction && (
@@ -194,6 +232,7 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
           ) : (
             <p
               className={cn(
+                inter.className,
                 "whitespace-pre-line",
                 isSingleEmoji(message.message) && "text-6xl",
                 !isSingleEmoji(message.message) && "truncate"
@@ -211,13 +250,29 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
 
           {!!message?.editedAt ? (
             <span
-              className={cn("text-[0.7rem] font-light text-nowrap opacity-40")}
+              className={cn(
+                "text-[0.7rem] font-light text-nowrap opacity-40",
+
+                messageUX.receiverOnlyEmoji && messageUI.emoji.receiver,
+
+                messageUX.receiverOnlyAsset && messageUI.assets.receiver,
+
+                messageUX.receiverOnlyGif && messageUI.gif.receiver
+              )}
             >
               Edited {formatTimeAgo(message.editedAt)}
             </span>
           ) : (
             <span
-              className={cn("text-[0.7rem] font-light text-nowrap opacity-40")}
+              className={cn(
+                "text-[0.7rem] font-light text-nowrap opacity-40",
+
+                messageUX.receiverOnlyEmoji && messageUI.emoji.receiver,
+
+                messageUX.receiverOnlyAsset && messageUI.assets.receiver,
+
+                messageUX.receiverOnlyGif && messageUI.gif.receiver
+              )}
             >
               Sent {formatTimeAgo(message.timestamp)}
             </span>
@@ -241,14 +296,17 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
             </DropdownMenu>
           ) : (
             !isSingleEmoji(message.message) && (
-              <Popover>
-                <PopoverTrigger asChild ref={reactionRef}>
+              <Popover
+                open={isRectionOpen}
+                onOpenChange={(open) => setIsRectionOpen(open)}
+              >
+                <PopoverTrigger asChild>
                   <span className="absolute top-0 -right-5 text-primary/20 hover:text-primary">
                     <SmilePlus size={16} />
                   </span>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="relative w-auto p-0 bg-transparent rounded-full border-none shadow"
+                  className="relative w-auto p-0 bg-transparent rounded-full border-none shadow -top-14"
                   align="center"
                 >
                   <ReactionBarSelector

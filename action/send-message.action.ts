@@ -63,8 +63,9 @@ export async function sendMessage(data: TMessageDataToSend) {
 
     const title = data.asset
       ? `${data.username} shared an image`
+      : data.gif ? `${data.username} sent a GIF`
       : `New message from ${data.username}`;
-    const body = data.asset ? "Image attached" : data.message;
+    const body = data.asset ? "Image attached" : data.gif ? "GIF" : data.message;
 
     // 5. Prepare and send the push notification
     const payload = JSON.stringify({

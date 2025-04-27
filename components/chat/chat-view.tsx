@@ -121,7 +121,7 @@ export default function ChatView() {
           {!!imageData && (
             <ImagePreview open={openPreview} setOpen={setOpenPreview} />
           )}
-          <div className="flex-1 w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-fit overflow-y-auto overflow-x-hidden space-y-4 px-2">
+          <div className="flex-1 w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-fit overflow-y-auto overflow-x-hidden px-2">
             {messages.map((message) => (
               <Message
                 key={message.id}
