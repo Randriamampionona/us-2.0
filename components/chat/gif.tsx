@@ -51,14 +51,29 @@ export default function Gif({ setIsPending, setIsGifOpen }: TProps) {
 
   // prevent autoFocusSearch
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (pickerRef.current) {
-        const input = pickerRef.current.querySelector("input");
-        input?.blur();
-      }
-    }, 50); // wait a bit for the input to appear and focus
+    if (!pickerRef.current) return;
 
-    return () => clearTimeout(timeout);
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.type === "childList") {
+          const input = pickerRef.current?.querySelector("input");
+          if (input) {
+            input.setAttribute("readonly", "true"); // Prevent focus pop
+            input.blur();
+            setTimeout(() => {
+              input.removeAttribute("readonly"); // Re-enable typing
+            }, 50);
+
+            observer.disconnect(); // 💥 STOP observing after first fix
+            break;
+          }
+        }
+      }
+    });
+
+    observer.observe(pickerRef.current, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
   }, []);
 
   return (
