@@ -28,6 +28,7 @@ export default function Gif({ setIsPending, setIsGifOpen }: TProps) {
   // send gif directly
   const handleGifClick = async (gif: TenorImage) => {
     setIsPending(true);
+    setIsGifOpen(false);
 
     try {
       const data: TMessageDataToSend = {
@@ -44,7 +45,6 @@ export default function Gif({ setIsPending, setIsGifOpen }: TProps) {
     } catch (error: any) {
       console.log(error);
     } finally {
-      setIsGifOpen(false);
       setIsPending(false);
     }
   };

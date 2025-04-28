@@ -225,7 +225,12 @@ export default function ChatForm() {
   }, [userId]);
 
   return (
-    <div className="w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-fit pt-2 space-y-1">
+    <div
+      className={cn(
+        "w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-fit pt-2 space-y-1",
+        isPending && "opacity-45"
+      )}
+    >
       {/* typing indicator */}
       {!!typingUser && typingUser.typing && (
         <TypingBubble username={typingUser.username} />
@@ -243,12 +248,7 @@ export default function ChatForm() {
       {/* edit banna indicator */}
       {isOnEdit && <EditMessageBanner setValue={setValue} />}
 
-      <form
-        className={cn(
-          "w-full bg-card-foreground/5 border rounded-md",
-          isPending && "opacity-50"
-        )}
-      >
+      <form className="w-full bg-card-foreground/5 border rounded-md">
         <div className="flex-1 space-y-1">
           {/* input */}
           <textarea
