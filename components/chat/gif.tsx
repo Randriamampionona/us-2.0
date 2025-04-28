@@ -6,7 +6,7 @@ import GifPicker, {
   TenorImage,
 } from "gif-picker-react";
 import { useTheme } from "next-themes";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef } from "react";
 
 type TProps = {
   setIsPending: Dispatch<SetStateAction<boolean>>;
@@ -19,6 +19,7 @@ export default function Gif({ setIsPending, setIsGifOpen }: TProps) {
   const { userId } = useAuth();
   const { user } = useUser();
   const { resolvedTheme } = useTheme();
+  const pickerRef = useRef<HTMLDivElement>(null);
 
   // Map next-themes' string to GifPickerTheme enum
   const pickerTheme =
@@ -48,12 +49,26 @@ export default function Gif({ setIsPending, setIsGifOpen }: TProps) {
     }
   };
 
+  // prevent autoFocusSearch
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (pickerRef.current) {
+        const input = pickerRef.current.querySelector("input");
+        input?.blur();
+      }
+    }, 50); // wait a bit for the input to appear and focus
+
+    return () => clearTimeout(timeout);
+  }, []);
+
   return (
-    <GifPicker
-      tenorApiKey={tenorApiKey}
-      theme={pickerTheme}
-      onGifClick={handleGifClick}
-      autoFocusSearch={false}
-    />
+    <div ref={pickerRef}>
+      <GifPicker
+        tenorApiKey={tenorApiKey}
+        theme={pickerTheme}
+        onGifClick={handleGifClick}
+        autoFocusSearch={false}
+      />
+    </div>
   );
 }
