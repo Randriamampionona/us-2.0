@@ -53,6 +53,7 @@ export default function Gif({ setIsPending, setIsGifOpen }: TProps) {
       tenorApiKey={tenorApiKey}
       theme={pickerTheme}
       onGifClick={handleGifClick}
+      autoFocusSearch={false}
     />
   );
 }
