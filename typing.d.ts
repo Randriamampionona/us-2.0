@@ -8,6 +8,17 @@ type TReaction = {
   reaction: string;
 } | null;
 
+type ReplyToInfo = {
+  id: string;
+  content: {
+    message: string;
+    assets?: UploadApiResponse;
+    gif?: TenorImage;
+  };
+  username: string;
+  senderId: string;
+};
+
 type TMessageDataToSend = {
   sender_id: string;
   username: string | null;
@@ -15,6 +26,7 @@ type TMessageDataToSend = {
   reaction: TReaction;
   is_seen: boolean;
   is_deleted: boolean;
+  reply_to: ReplyToInfo | null;
   asset?: UploadApiResponse;
   gif?: TenorImage;
 };
@@ -29,6 +41,7 @@ type TMessage = {
   reaction: TReaction;
   is_seen: boolean;
   is_deleted: boolean;
+  reply_to: ReplyToInfo | null;
   asset?: UploadApiResponse;
   gif?: TenorImage;
 };

@@ -38,6 +38,8 @@ import TypingBubble from "./typing-bubble";
 import { USERCOLECTION_DEV, USERCOLECTION_PROD } from "@/constant";
 import { cn } from "@/lib/utils";
 import Gif from "./gif";
+import { useReply } from "@/store/use-reply.store";
+import ReplyToMessageBanner from "./reply-to-message-banner";
 
 const USERCOLECTION =
   process.env.NODE_ENV === "development"
@@ -54,6 +56,7 @@ type TTypingUser = {
 export default function ChatForm() {
   const { userId } = useAuth();
   const { user } = useUser();
+  const { replyTo, resetReplyId } = useReply();
 
   const { message_id, message, reset } = useEditMessage();
   const [value, setValue] = useState("");
@@ -154,6 +157,7 @@ export default function ChatForm() {
             reaction: null,
             is_seen: false,
             is_deleted: false,
+            reply_to: replyTo,
             asset: assetData,
           }
         : {
@@ -163,6 +167,7 @@ export default function ChatForm() {
             reaction: null,
             is_seen: false,
             is_deleted: false,
+            reply_to: replyTo,
           };
 
       if (isOnEdit) {
@@ -182,6 +187,7 @@ export default function ChatForm() {
       setValue("");
       setAsset(null);
       reset();
+      resetReplyId();
     }
   };
 
@@ -247,6 +253,8 @@ export default function ChatForm() {
 
       {/* edit banna indicator */}
       {isOnEdit && <EditMessageBanner setValue={setValue} />}
+
+      {replyTo && <ReplyToMessageBanner />}
 
       <form className="w-full bg-card-foreground/5 border rounded-md">
         <div className="flex-1 space-y-1">

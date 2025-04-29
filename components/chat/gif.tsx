@@ -1,4 +1,5 @@
 import { sendMessage } from "@/action/send-message.action";
+import { useReply } from "@/store/use-reply.store";
 import { TMessageDataToSend } from "@/typing";
 import { useAuth, useUser } from "@clerk/nextjs";
 import GifPicker, {
@@ -19,6 +20,7 @@ export default function Gif({ setIsPending, setIsGifOpen }: TProps) {
   const { userId } = useAuth();
   const { user } = useUser();
   const { resolvedTheme } = useTheme();
+  const { replyTo, resetReplyId } = useReply();
   const pickerRef = useRef<HTMLDivElement>(null);
 
   // Map next-themes' string to GifPickerTheme enum
@@ -38,6 +40,7 @@ export default function Gif({ setIsPending, setIsGifOpen }: TProps) {
         reaction: null,
         is_seen: false,
         is_deleted: false,
+        reply_to: replyTo,
         gif,
       };
 
@@ -46,6 +49,7 @@ export default function Gif({ setIsPending, setIsGifOpen }: TProps) {
       console.log(error);
     } finally {
       setIsPending(false);
+      resetReplyId();
     }
   };
 

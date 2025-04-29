@@ -33,6 +33,8 @@ import LinkPreviewer from "./link-preview";
 import { useImagePreview } from "@/store/use-image-preview.store";
 import { isSingleEmoji } from "@/utils/emoji-checker";
 import { useTheme } from "next-themes";
+import { useReply } from "@/store/use-reply.store";
+import MessageReply from "./message-reply";
 
 type TProps = {
   message: TMessage;
@@ -55,6 +57,7 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
   const { userId } = useAuth();
   const { user } = useUser();
   const { theme } = useTheme();
+  const { replyTo, setReplyId } = useReply();
 
   const { setNewMessage } = useEditMessage();
   const { setImageData } = useImagePreview();
@@ -89,6 +92,40 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
         setIsRectionOpen(false);
       }
     }
+  };
+
+  const triggerReply = () => {
+    const content = {
+      message: message.message,
+      assets: message.asset,
+      gif: {
+        ...message.gif,
+        id: message.gif?.id ?? "",
+        tenorUrl: message.gif?.tenorUrl ?? "",
+        shortTenorUrl: message.gif?.shortTenorUrl ?? "",
+        description: message.gif?.description ?? "",
+        createdAt:
+          message.gif?.createdAt instanceof Date
+            ? message.gif?.createdAt
+            : new Date(),
+        tags: message.gif?.tags ?? [],
+        url: message.gif?.url ?? "",
+        height: message.gif?.height ?? 0,
+        width: message.gif?.width ?? 0,
+        preview: {
+          url: message.gif?.preview?.url ?? "",
+          height: message.gif?.preview?.height ?? 0,
+          width: message.gif?.preview?.width ?? 0,
+        },
+      },
+    };
+
+    setReplyId({
+      id: message.id,
+      content,
+      username: message.username,
+      senderId: message.sender_id,
+    });
   };
 
   const messageUX = {
@@ -138,164 +175,183 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
           message
         </p>
       ) : (
-        <div
-          className={cn(
-            "mb-14",
-            isSender(message.sender_id)
-              ? messageUI.default.sender
-              : messageUI.default.receiver,
-            messageUX.hasSeenOrReaction && messageUI.hasSeenOrReaction,
-            isSingleEmoji(message.message) && messageUI.emoji.default,
-            messageUX.hasAsset && messageUI.assets.default,
-            messageUX.hasGif && messageUI.gif.default
-          )}
-        >
-          {!!message.reaction && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Badge
-                    variant="outline"
-                    className={cn(
-                      "absolute -bottom-6 left-0 px-2 cursor-default",
-                      message.reaction?.reactor_id == userId && "cursor-pointer"
-                    )}
-                    onClick={() =>
-                      message.reaction?.reactor_id == userId &&
-                      onChangeReaction("", message.id, "remove")
-                    }
-                  >
-                    {message.reaction?.reaction}
-                  </Badge>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    {message.sender_id != userId
-                      ? "You"
-                      : message.reaction.reactor_username}
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-
-          {/* asset */}
-          {message.asset && (
-            <Image
-              src={message.asset.secure_url}
-              alt={message.asset.original_filename ?? ""}
-              width={message.asset.width}
-              height={message.asset.height}
-              className="hover:contrast-[.95] cursor-pointer"
-              onClick={() => {
-                setImageData(message.asset!);
-                setOpenPreview(true);
-              }}
-            />
-          )}
-
-          {/* git */}
-          {message.gif && (
-            <Image
-              src={message.gif.url}
-              alt={message.gif.description ?? ""}
-              width={message.gif.width}
-              height={message.gif.height}
+        <div>
+          {/* message reply */}
+          {message.reply_to && (
+            <MessageReply
+              className={
+                isSender(message.sender_id)
+                  ? messageUI.default.sender
+                  : messageUI.default.receiver
+              }
+              message={message.reply_to}
             />
           )}
 
           {/* message */}
-          {isValidUrl(message.message) ? (
-            <LinkPreviewer url={message.message} />
-          ) : (
-            <p
-              className={cn(
-                inter.className,
-                "whitespace-pre-line",
-                isSingleEmoji(message.message) && "text-6xl",
-                !isSingleEmoji(message.message) && "truncate"
-              )}
-            >
-              {message.message}
-            </p>
-          )}
+          <div
+            className={cn(
+              "mb-14",
+              isSender(message.sender_id)
+                ? messageUI.default.sender
+                : messageUI.default.receiver,
+              messageUX.hasSeenOrReaction && messageUI.hasSeenOrReaction,
+              isSingleEmoji(message.message) && messageUI.emoji.default,
+              messageUX.hasAsset && messageUI.assets.default,
+              messageUX.hasGif && messageUI.gif.default
+            )}
+            onDoubleClick={triggerReply}
+          >
+            {/* reaction */}
+            {!!message.reaction && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        "absolute -bottom-6 left-0 px-2 cursor-default",
+                        message.reaction?.reactor_id == userId &&
+                          "cursor-pointer"
+                      )}
+                      onClick={() =>
+                        message.reaction?.reactor_id == userId &&
+                        onChangeReaction("", message.id, "remove")
+                      }
+                    >
+                      {message.reaction?.reaction}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      {message.sender_id != userId
+                        ? "You"
+                        : message.reaction.reactor_username}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
 
-          {/* seen */}
-          {message.is_seen && message.sender_id == userId && (
-            <span className="absolute -bottom-6 te right-0 px-2 text-primary/20 italic">
-              seen
-            </span>
-          )}
+            {/* asset */}
+            {message.asset && (
+              <Image
+                src={message.asset.secure_url}
+                alt={message.asset.original_filename ?? ""}
+                width={message.asset.width}
+                height={message.asset.height}
+                className="hover:contrast-[.95] cursor-pointer"
+                onClick={() => {
+                  setImageData(message.asset!);
+                  setOpenPreview(true);
+                }}
+              />
+            )}
 
-          {/* date */}
-          {!!message?.editedAt ? (
-            <span
-              className={cn(
-                "text-[0.7rem] font-light text-nowrap opacity-40",
+            {/* git */}
+            {message.gif && (
+              <Image
+                src={message.gif.url}
+                alt={message.gif.description ?? ""}
+                width={message.gif.width}
+                height={message.gif.height}
+              />
+            )}
 
-                messageUX.receiverOnlyEmoji && messageUI.emoji.receiver,
-
-                messageUX.receiverOnlyAsset && messageUI.assets.receiver,
-
-                messageUX.receiverOnlyGif && messageUI.gif.receiver
-              )}
-            >
-              Edited {formatTimeAgo(message.editedAt)}
-            </span>
-          ) : (
-            <span
-              className={cn(
-                "text-[0.7rem] font-light text-nowrap opacity-40",
-
-                messageUX.receiverOnlyEmoji && messageUI.emoji.receiver,
-
-                messageUX.receiverOnlyAsset && messageUI.assets.receiver,
-
-                messageUX.receiverOnlyGif && messageUI.gif.receiver
-              )}
-            >
-              Sent {formatTimeAgo(message.timestamp)}
-            </span>
-          )}
-
-          {isSender(message.sender_id) ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger className="absolute top-0 -left-5 text-primary/20 hover:text-primary">
-                <Edit size={16} />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem
-                  onClick={() => setNewMessage(message.id, message.message)}
-                >
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onDelete(message.id)}>
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            !isSingleEmoji(message.message) && (
-              <Popover
-                open={isRectionOpen}
-                onOpenChange={(open) => setIsRectionOpen(open)}
+            {/* message */}
+            {isValidUrl(message.message) ? (
+              <LinkPreviewer url={message.message} />
+            ) : (
+              <p
+                className={cn(
+                  inter.className,
+                  "whitespace-pre-line",
+                  isSingleEmoji(message.message) && "text-6xl",
+                  !isSingleEmoji(message.message) && "truncate"
+                )}
               >
-                <PopoverTrigger asChild>
-                  <span className="absolute top-0 -right-5 text-primary/20 hover:text-primary">
-                    <SmilePlus size={16} />
-                  </span>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="end">
-                  <Picker
-                    theme={theme ?? "light"}
-                    onEmojiSelect={(reaction: Reaction) =>
-                      onChangeReaction(reaction.native, message.id, "set")
-                    }
-                  />
-                </PopoverContent>
-              </Popover>
-            )
-          )}
+                {message.message}
+              </p>
+            )}
+
+            {/* seen */}
+            {message.is_seen && message.sender_id == userId && (
+              <span className="absolute -bottom-6 te right-0 px-2 text-primary/20 italic">
+                seen
+              </span>
+            )}
+
+            {/* date */}
+            {!!message?.editedAt ? (
+              <span
+                className={cn(
+                  "text-[0.7rem] font-light text-nowrap opacity-40",
+
+                  messageUX.receiverOnlyEmoji && messageUI.emoji.receiver,
+
+                  messageUX.receiverOnlyAsset && messageUI.assets.receiver,
+
+                  messageUX.receiverOnlyGif && messageUI.gif.receiver
+                )}
+              >
+                Edited {formatTimeAgo(message.editedAt)}
+              </span>
+            ) : (
+              <span
+                className={cn(
+                  "text-[0.7rem] font-light text-nowrap opacity-40",
+
+                  messageUX.receiverOnlyEmoji && messageUI.emoji.receiver,
+
+                  messageUX.receiverOnlyAsset && messageUI.assets.receiver,
+
+                  messageUX.receiverOnlyGif && messageUI.gif.receiver
+                )}
+              >
+                Sent {formatTimeAgo(message.timestamp)}
+              </span>
+            )}
+
+            {/* message option */}
+            {isSender(message.sender_id) ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="absolute top-0 -left-5 text-primary/20 hover:text-primary">
+                  <Edit size={16} />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem
+                    onClick={() => setNewMessage(message.id, message.message)}
+                  >
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onDelete(message.id)}>
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              !isSingleEmoji(message.message) && (
+                <Popover
+                  open={isRectionOpen}
+                  onOpenChange={(open) => setIsRectionOpen(open)}
+                >
+                  <PopoverTrigger asChild>
+                    <span className="absolute top-0 -right-5 text-primary/20 hover:text-primary">
+                      <SmilePlus size={16} />
+                    </span>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="end">
+                    <Picker
+                      theme={theme ?? "light"}
+                      onEmojiSelect={(reaction: Reaction) =>
+                        onChangeReaction(reaction.native, message.id, "set")
+                      }
+                    />
+                  </PopoverContent>
+                </Popover>
+              )
+            )}
+          </div>
         </div>
       )}
     </>
