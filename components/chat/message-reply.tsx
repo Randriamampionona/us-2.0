@@ -13,6 +13,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default function MessageReply({ className, message }: Tprops) {
   const [showAll, setShowAll] = useState(false);
+
+  console.log(message);
   return (
     <div
       className={cn(
@@ -21,7 +23,7 @@ export default function MessageReply({ className, message }: Tprops) {
       )}
       onClick={() => setShowAll((state) => !state)}
     >
-      {message.content.assets && (
+      {!!message.content.assets && (
         <Image
           src={message.content.assets.secure_url}
           alt={message.content.assets.original_filename ?? ""}
@@ -30,7 +32,7 @@ export default function MessageReply({ className, message }: Tprops) {
         />
       )}
 
-      {message.content.gif && (
+      {!!message.content.gif && !!message.content.gif.url && (
         <Image
           src={message.content.gif.url}
           alt={message.content.gif.description ?? ""}

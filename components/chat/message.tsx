@@ -9,6 +9,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -24,7 +25,14 @@ import {
 } from "@/components/ui/tooltip";
 import Picker from "@emoji-mart/react";
 import { Badge } from "@/components/ui/badge";
-import { Edit, SmilePlus } from "lucide-react";
+import {
+  Clipboard,
+  CornerDownLeft,
+  Edit,
+  Pencil,
+  SmilePlus,
+  Trash2,
+} from "lucide-react";
 import { useEditMessage } from "@/store/use-edit-message.store";
 import { setReaction } from "@/action/set-reaction.action";
 import Image from "next/image";
@@ -35,6 +43,7 @@ import { isSingleEmoji } from "@/utils/emoji-checker";
 import { useTheme } from "next-themes";
 import { useReply } from "@/store/use-reply.store";
 import MessageReply from "./message-reply";
+import { toastify } from "@/utils/toastify";
 
 type TProps = {
   message: TMessage;
@@ -126,6 +135,24 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
       username: message.username,
       senderId: message.sender_id,
     });
+  };
+
+  const onCopy = async (text: string) => {
+    if (!message.message) return;
+
+    if (!navigator.clipboard) {
+      console.error("Clipboard API not supported");
+      alert("Clipboard not supported in your browser");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+
+      toastify("success", "Copied to clipboard");
+    } catch (err) {
+      alert("Failed to copy text to clipboard. Please try again.");
+    }
   };
 
   const messageUX = {
@@ -322,34 +349,95 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
                   <DropdownMenuItem
                     onClick={() => setNewMessage(message.id, message.message)}
                   >
-                    Edit
+                    <div className="flex items-center justify-start space-x-2">
+                      <DropdownMenuShortcut>
+                        <Pencil />
+                      </DropdownMenuShortcut>
+                      <p>Edit</p>
+                    </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onDelete(message.id)}>
-                    Delete
+                  <DropdownMenuItem onClick={triggerReply}>
+                    <div className="flex items-center justify-start space-x-2">
+                      <DropdownMenuShortcut>
+                        <CornerDownLeft />
+                      </DropdownMenuShortcut>
+                      <p>Reply</p>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => onCopy(message.message)}
+                    disabled={!message.message}
+                  >
+                    <div className="flex items-center justify-start space-x-2">
+                      <DropdownMenuShortcut>
+                        <Clipboard />
+                      </DropdownMenuShortcut>
+                      <p>Copy</p>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => onDelete(message.id)}
+                    className="text-destructive hover:!bg-destructive/10 hover:!text-destructive"
+                  >
+                    <div className="flex items-center justify-start space-x-2">
+                      <DropdownMenuShortcut>
+                        <Trash2 />
+                      </DropdownMenuShortcut>
+                      <p>Delete</p>
+                    </div>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              !isSingleEmoji(message.message) && (
-                <Popover
-                  open={isRectionOpen}
-                  onOpenChange={(open) => setIsRectionOpen(open)}
-                >
-                  <PopoverTrigger asChild>
-                    <span className="absolute top-0 -right-5 text-primary/20 hover:text-primary">
-                      <SmilePlus size={16} />
-                    </span>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="end">
-                    <Picker
-                      theme={theme ?? "light"}
-                      onEmojiSelect={(reaction: Reaction) =>
-                        onChangeReaction(reaction.native, message.id, "set")
-                      }
-                    />
-                  </PopoverContent>
-                </Popover>
-              )
+              <div className="flex flex-col space-y-1 absolute top-0 -right-5 ">
+                {!isSingleEmoji(message.message) && (
+                  <Popover
+                    open={isRectionOpen}
+                    onOpenChange={(open) => setIsRectionOpen(open)}
+                  >
+                    <PopoverTrigger asChild>
+                      <span className="text-primary/20 hover:text-primary">
+                        <SmilePlus size={16} />
+                      </span>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="end">
+                      <Picker
+                        theme={theme ?? "light"}
+                        onEmojiSelect={(reaction: Reaction) =>
+                          onChangeReaction(reaction.native, message.id, "set")
+                        }
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="text-primary/20 hover:text-primary">
+                    <Edit size={16} />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={triggerReply}>
+                      <div className="flex items-center justify-start space-x-2">
+                        <DropdownMenuShortcut>
+                          <CornerDownLeft />
+                        </DropdownMenuShortcut>
+                        <p>Reply</p>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onCopy(message.message)}
+                      disabled={!message.message}
+                    >
+                      <div className="flex items-center justify-start space-x-2">
+                        <DropdownMenuShortcut>
+                          <Clipboard />
+                        </DropdownMenuShortcut>
+                        <p>Copy</p>
+                      </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             )}
           </div>
         </div>
