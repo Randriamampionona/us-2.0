@@ -294,7 +294,7 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
                   messageUX.receiverOnlyGif && messageUI.gif.receiver
                 )}
               >
-                Edited {formatTimeAgo(message.editedAt)}
+                {formatTimeAgo(message.editedAt, true)}
               </span>
             ) : (
               <span
@@ -308,7 +308,7 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
                   messageUX.receiverOnlyGif && messageUI.gif.receiver
                 )}
               >
-                Sent {formatTimeAgo(message.timestamp)}
+                {formatTimeAgo(message.timestamp, false)}
               </span>
             )}
 
