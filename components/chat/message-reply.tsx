@@ -14,7 +14,6 @@ const inter = Inter({ subsets: ["latin"] });
 export default function MessageReply({ className, message }: Tprops) {
   const [showAll, setShowAll] = useState(false);
 
-  console.log(message);
   return (
     <div
       className={cn(
