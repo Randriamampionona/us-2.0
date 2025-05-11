@@ -4,7 +4,7 @@ import "./globals.css";
 
 import Navbar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
-import { ClerkProvider } from "@clerk/nextjs";
+import { ClerkProvider, SignedIn } from "@clerk/nextjs";
 import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
@@ -40,7 +40,10 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Toaster position="top-center" />
-            <Navbar />
+            <SignedIn>
+              <Navbar />
+            </SignedIn>
+
             {children}
           </ThemeProvider>
         </body>

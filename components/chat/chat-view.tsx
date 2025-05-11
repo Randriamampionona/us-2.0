@@ -2,7 +2,7 @@
 
 import { TMessage, TMessages } from "@/typing";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import Message from "./message";
 import { db } from "@/firebase";
 import { CHATCOLECTION_DEV, CHATCOLECTION_PROD } from "@/constant";

@@ -10,19 +10,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import ActiveStatus from "./active-status";
+import UserStatus from "./user-status";
 
 export default function Navbar() {
   const { setTheme } = useTheme();
 
   return (
-    <nav className="fixed top-2 right-2 z-50">
+    <nav className="fixed flex items-center justify-between w-full p-2 z-50 backdrop-blur-sm bg-transparent">
+      <UserStatus />
       <div className="flex items-center justify-end gap-4">
         <div className="relative">
           <SignedIn>
             <UserButton />
           </SignedIn>
-          <ActiveStatus />
         </div>
 
         <DropdownMenu>
