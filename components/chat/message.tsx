@@ -83,6 +83,10 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
   ) => {
     if (!userId) return;
 
+    if (key === "set") {
+      setIsRectionOpen(false);
+    }
+
     const reactionData: TReaction = {
       reactor_id: userId,
       reactor_username: user?.firstName!,
@@ -93,13 +97,10 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
       await setReaction({
         message_id,
         reactionData: key === "remove" ? null : reactionData,
+        isRemove: key === "remove" ? true : false,
       });
     } catch (error) {
       console.log(error);
-    } finally {
-      if (key === "set") {
-        setIsRectionOpen(false);
-      }
     }
   };
 
