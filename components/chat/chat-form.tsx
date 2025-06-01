@@ -1,7 +1,6 @@
 "use client";
 
 import { useAuth, useUser } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
 import {
   Camera,
   ImagePlay,
@@ -10,7 +9,6 @@ import {
   SmilePlus,
 } from "lucide-react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
-import { sendMessage } from "@/action/send-message.action";
 import Emoji from "./emoji";
 import { useEditMessage } from "@/store/use-edit-message.store";
 import { editMessage } from "@/action/edit-message.action";
@@ -40,6 +38,7 @@ import { cn } from "@/lib/utils";
 import Gif from "./gif";
 import { useReply } from "@/store/use-reply.store";
 import ReplyToMessageBanner from "./reply-to-message-banner";
+import { sendMessage } from "@/action/send-message.action";
 
 const USERCOLECTION =
   process.env.NODE_ENV === "development"
@@ -69,6 +68,7 @@ export default function ChatForm() {
   const [typingUser, setTypingUser] = useState<TTypingUser | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const sendBtnRef = useRef<HTMLButtonElement | null>(null);
 
   const isOnEdit = !!message_id;
 
@@ -230,6 +230,26 @@ export default function ChatForm() {
     return () => unsubscribe(); // cleanup listener
   }, [userId]);
 
+  useEffect(() => {
+    if (typeof window == undefined) return;
+    window.addEventListener("keydown", async (e) => {
+      const code = e.code;
+      const hasCtrl = e.ctrlKey;
+
+      switch (e.code) {
+        case "Enter":
+          if (hasCtrl) {
+            sendBtnRef.current?.click();
+          }
+
+          break;
+
+        default:
+          break;
+      }
+    });
+  }, [typeof window, sendBtnRef.current]);
+
   return (
     <div
       className={cn(
@@ -333,10 +353,11 @@ export default function ChatForm() {
 
           {/* send btn */}
           <button
-            type="submit"
+            type="button"
             disabled={isPending || (!value && !asset)}
             onClick={onSend}
             className="pl-4 opacity-65"
+            ref={sendBtnRef}
           >
             {isPending ? (
               <LoaderCircle className="animate-spin" />
