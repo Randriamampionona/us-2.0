@@ -39,6 +39,7 @@ import Gif from "./gif";
 import { useReply } from "@/store/use-reply.store";
 import ReplyToMessageBanner from "./reply-to-message-banner";
 import { sendMessage } from "@/action/send-message.action";
+import VoiceInput from "./voice-input";
 
 const USERCOLECTION =
   process.env.NODE_ENV === "development"
@@ -367,6 +368,7 @@ export default function ChatForm() {
           </button>
         </div>
       </form>
+      <VoiceInput />
     </div>
   );
 }
