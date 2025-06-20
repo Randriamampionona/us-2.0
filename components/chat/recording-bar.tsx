@@ -41,7 +41,7 @@ export default function RecordingBar({
   };
 
   return (
-    <div className="flex items-center w-full max-w-md space-x-2">
+    <div className="flex-1 flex items-center w-full max-w-md space-x-2">
       {/* Trash Icon */}
       <button className="text-white" type="button" onClick={deleteRecording}>
         <Trash size={20} />
@@ -50,8 +50,7 @@ export default function RecordingBar({
       {/* Recording Bar */}
       <div
         className={cn(
-          "flex-1 rounded-full h-10 px-4 flex items-center justify-between text-white space-x-2",
-          isPaused ? "bg-loveRose/30" : "bg-loveRose"
+          "relative flex-1 rounded-full h-10 px-4 flex items-center justify-between text-white bg-loveRose space-x-2 overflow-hidden"
         )}
       >
         {/* Pause/Play Toggle & Waveform */}
@@ -66,7 +65,7 @@ export default function RecordingBar({
 
           {/* Waveform dots */}
           <div className="flex space-x-1">
-            {Array.from({ length: 20 }).map((_, i) => (
+            {Array.from({ length: 69 }).map((_, i) => (
               <div
                 key={i}
                 className={`w-1 h-2 bg-white rounded-full origin-center ${
@@ -81,7 +80,9 @@ export default function RecordingBar({
         </div>
 
         {/* Timer */}
-        <div className="text-sm font-semibold pr-2">{formatTime(timer)}</div>
+        <div className="flex items-center justify-centertext-sm font-semibold absolute right-0 h-full bg-loveRose pl-2 pr-4">
+          <p className="text-sm">{formatTime(timer)}</p>
+        </div>
       </div>
     </div>
   );

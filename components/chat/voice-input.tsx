@@ -118,7 +118,7 @@ export default function VoiceInput({ setIsOnRecord }: TProps) {
   };
 
   return (
-    <div className="">
+    <div className="flex items-center justify-center">
       {/* Recording Control Button */}
       {!isRecording && !isPaused && (
         <button type="button" className="opacity-65" onClick={startRecording}>
@@ -127,7 +127,7 @@ export default function VoiceInput({ setIsOnRecord }: TProps) {
       )}
 
       {(isRecording || isPaused) && (
-        <div className="flex items-center justify-between space-x-2 bg-card-foreground/5 border rounded-md px-8 py-3 w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto">
+        <div className="flex items-center justify-center space-x-2 bg-card-foreground/5 border rounded-md px-8 py-3 w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto">
           {/* Show recording UI */}
           <RecordingBar
             isPaused={isPaused}
@@ -136,8 +136,8 @@ export default function VoiceInput({ setIsOnRecord }: TProps) {
             resumeRecording={resumeRecording}
             deleteRecording={deleteRecording}
           />
-          {/* Stop Button and send (always shown if recording or paused) */}
 
+          {/* Stop Button and send (always shown if recording or paused) */}
           <button type="button" onClick={stopRecording} className="opacity-65">
             <SendHorizonal size={20} />
           </button>
