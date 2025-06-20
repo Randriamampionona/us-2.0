@@ -57,6 +57,21 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      keyframes: {
+        wavePulse: {
+          "0%, 100%": {
+            transform: "scaleY(0.5)",
+            opacity: "0.6",
+          },
+          "50%": {
+            transform: "scaleY(1)",
+            opacity: "1",
+          },
+        },
+      },
+      animation: {
+        wavePulse: "wavePulse .75s ease-in-out infinite",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
