@@ -41,7 +41,7 @@ export default function RecordingBar({
   };
 
   return (
-    <div className="flex-1 flex items-center w-full max-w-md space-x-2">
+    <div className="flex items-center max-w-full w-full space-x-2">
       {/* Trash Icon */}
       <button className="text-white" type="button" onClick={deleteRecording}>
         <Trash size={20} />
@@ -50,22 +50,23 @@ export default function RecordingBar({
       {/* Recording Bar */}
       <div
         className={cn(
-          "relative flex-1 rounded-full h-10 px-4 flex items-center justify-between text-white bg-loveRose space-x-2 overflow-hidden"
+          "flex-1 rounded-md h-[3rem] px-4 flex items-center justify-between text-foreground overflow-hidden gap-x-2",
+          isPaused ? "bg-loveRose/15" : "bg-loveRose"
         )}
       >
-        {/* Pause/Play Toggle & Waveform */}
-        <div className="flex items-center gap-2">
-          <button type="button" onClick={handleToggle}>
-            {isPaused ? (
-              <Play className="w-5 h-5 text-white" />
-            ) : (
-              <Pause className="w-5 h-5 text-white" />
-            )}
-          </button>
+        {/* Pause/Play Toggle */}
+        <button type="button" onClick={handleToggle}>
+          {isPaused ? (
+            <Play className="w-5 h-5 text-white" />
+          ) : (
+            <Pause className="w-5 h-5 text-white" />
+          )}
+        </button>
 
-          {/* Waveform dots */}
-          <div className="flex space-x-1">
-            {Array.from({ length: 69 }).map((_, i) => (
+        {/* Waveform dots */}
+        <div className="relative flex-1 items-center justify-center overflow-x-hidden h-full">
+          <div className="flex-1 flex space-x-1 absolute top-1/2 -translate-y-1/2">
+            {Array.from({ length: 75 }).map((_, i) => (
               <div
                 key={i}
                 className={`w-1 h-2 bg-white rounded-full origin-center ${
@@ -80,7 +81,7 @@ export default function RecordingBar({
         </div>
 
         {/* Timer */}
-        <div className="flex items-center justify-centertext-sm font-semibold absolute right-0 h-full bg-loveRose pl-2 pr-4">
+        <div>
           <p className="text-sm">{formatTime(timer)}</p>
         </div>
       </div>

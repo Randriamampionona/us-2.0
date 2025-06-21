@@ -6,12 +6,18 @@ import { uploadAudio } from "@/action/upload-audio.action";
 import { LoaderCircle, Mic, Pause, Play, SendHorizonal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import RecordingBar from "./recording-bar";
+import { toastify } from "@/utils/toastify";
+import { sendMessage } from "@/action/send-message.action";
+import { TMessageDataToSend } from "@/typing";
+import { useAuth, useUser } from "@clerk/nextjs";
 
 type TProps = {
   setIsOnRecord: Dispatch<SetStateAction<boolean>>;
 };
 
 export default function VoiceInput({ setIsOnRecord }: TProps) {
+  const { userId } = useAuth();
+  const { user } = useUser();
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [_audioURL, setAudioURL] = useState<string | null>(null);
@@ -87,13 +93,32 @@ export default function VoiceInput({ setIsOnRecord }: TProps) {
       });
 
       // Upload base64 audio
-      await uploadAudio(base64);
+      const uploadedAudioResult = await uploadAudio(base64);
 
-      setIsOnRecord(false);
+      if (!uploadedAudioResult)
+        throw new Error(
+          "Audio upload failed. Please try again or check your connection."
+        );
+
+      toastify("success", "Audio uploaded");
+
+      const data: TMessageDataToSend = {
+        sender_id: userId!,
+        username: user!.firstName,
+        message: "",
+        reaction: null,
+        is_seen: false,
+        is_deleted: false,
+        reply_to: null,
+        audio: uploadedAudioResult,
+      };
+
+      await sendMessage(data);
     } catch (e) {
       console.error("Error stopping recording:", e);
       setIsRecording(false);
       setIsPaused(false);
+    } finally {
       setIsOnRecord(false);
     }
   };
@@ -118,7 +143,13 @@ export default function VoiceInput({ setIsOnRecord }: TProps) {
   };
 
   return (
-    <div className="flex items-center justify-center">
+    <div
+      className={cn(
+        "flex items-center justify-center",
+        (isRecording || isPaused) &&
+          "w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto"
+      )}
+    >
       {/* Recording Control Button */}
       {!isRecording && !isPaused && (
         <button type="button" className="opacity-65" onClick={startRecording}>
@@ -127,7 +158,7 @@ export default function VoiceInput({ setIsOnRecord }: TProps) {
       )}
 
       {(isRecording || isPaused) && (
-        <div className="flex items-center justify-center space-x-2 bg-card-foreground/5 border rounded-md px-8 py-3 w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto">
+        <div className="flex items-center justify-center max-w-full min-w-full space-x-2">
           {/* Show recording UI */}
           <RecordingBar
             isPaused={isPaused}

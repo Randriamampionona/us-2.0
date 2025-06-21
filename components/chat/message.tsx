@@ -44,6 +44,7 @@ import { useTheme } from "next-themes";
 import { useReply } from "@/store/use-reply.store";
 import MessageReply from "./message-reply";
 import { toastify } from "@/utils/toastify";
+import AudioPlayer from "./audio-palyer";
 
 type TProps = {
   message: TMessage;
@@ -285,6 +286,9 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
                 height={message.gif.height}
               />
             )}
+
+            {/* Audio */}
+            {message.audio && <AudioPlayer src={message.audio.secure_url} />}
 
             {/* message */}
             {isValidUrl(message.message) ? (
