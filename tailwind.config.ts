@@ -7,6 +7,7 @@ export default {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  safelist: ["animate-waveBounce", "animate-wavePulse"],
   theme: {
     extend: {
       colors: {
@@ -56,6 +57,32 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        wavePulse: {
+          "0%, 100%": {
+            transform: "scaleY(0.5)",
+            opacity: "0.6",
+          },
+          "50%": {
+            transform: "scaleY(1)",
+            opacity: "1",
+          },
+        },
+        waveBounce: {
+          "0%, 100%": {
+            transform: "scaleY(0.5)",
+            opacity: "0.6",
+          },
+          "50%": {
+            transform: "scaleY(1.2)",
+            opacity: "1",
+          },
+        },
+      },
+      animation: {
+        wavePulse: "wavePulse .75s ease-in-out infinite",
+        waveBounce: "waveBounce 1.2s ease-in-out infinite",
       },
     },
   },

@@ -28,6 +28,7 @@ type TMessageDataToSend = {
   is_deleted: boolean;
   reply_to: ReplyToInfo | null;
   asset?: UploadApiResponse;
+  audio?: UploadApiResponse;
   gif?: TenorImage;
 };
 
@@ -43,6 +44,7 @@ type TMessage = {
   is_deleted: boolean;
   reply_to: ReplyToInfo | null;
   asset?: UploadApiResponse;
+  audio?: UploadApiResponse;
   gif?: TenorImage;
 };
 

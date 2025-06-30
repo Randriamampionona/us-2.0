@@ -39,6 +39,7 @@ import Gif from "./gif";
 import { useReply } from "@/store/use-reply.store";
 import ReplyToMessageBanner from "./reply-to-message-banner";
 import { sendMessage } from "@/action/send-message.action";
+import VoiceInput from "./voice-input";
 
 const USERCOLECTION =
   process.env.NODE_ENV === "development"
@@ -67,6 +68,7 @@ export default function ChatForm() {
   );
   const [typingUser, setTypingUser] = useState<TTypingUser | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const [isOnRecord, setIsOnRecord] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const sendBtnRef = useRef<HTMLButtonElement | null>(null);
 
@@ -276,95 +278,122 @@ export default function ChatForm() {
 
       {replyTo && <ReplyToMessageBanner />}
 
-      <form className="w-full bg-card-foreground/5 border rounded-md">
-        <div className="flex-1 space-y-1">
-          {/* input */}
-          <textarea
-            autoFocus
-            spellCheck={false}
-            lang="zxx"
-            autoComplete="off"
-            ref={textareaRef}
-            className="resize-none overflow-y-hidden flex h-10 max-h-64 w-full rounded-none border-none border-input bg-transparent px-3 py-2 text-base file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 md:text-sm outline-none ring-0 focus-visible:ring-0 focus-visible:outline-none shadow-none"
-            placeholder="Message"
-            value={value}
-            disabled={isPending}
-            onChange={onChangeFn}
-          />
-        </div>
+      <form
+        className={cn(
+          "w-full",
+          !isOnRecord && "bg-card-foreground/5 border rounded-md"
+        )}
+      >
+        {/* input */}
+        {!isOnRecord && (
+          <div className="flex-1 space-y-1">
+            <textarea
+              autoFocus
+              spellCheck={false}
+              lang="zxx"
+              autoComplete="off"
+              ref={textareaRef}
+              className="resize-none overflow-y-hidden flex h-10 max-h-64 w-full rounded-none border-none border-input bg-transparent px-3 py-2 text-base file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 md:text-sm outline-none ring-0 focus-visible:ring-0 focus-visible:outline-none shadow-none"
+              placeholder="Message"
+              value={value}
+              disabled={isPending || isOnRecord}
+              onChange={onChangeFn}
+            />
+          </div>
+        )}
 
-        <div className="flex items-center justify-end space-x-4 divide-x-2 p-2 pr-4">
+        {/* chat options */}
+        <div
+          className={cn(
+            "flex items-center space-x-4 divide-x-2 p-2 pr-4",
+            isOnRecord ? "justify-center" : "justify-end"
+          )}
+        >
           <div className="flex items-center space-x-4">
             {/* emoji btn */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <button
-                  type="button"
-                  disabled={isPending}
-                  className="opacity-65"
-                >
-                  <SmilePlus size={20} />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="end">
-                <Emoji setValue={setValue} textareaRef={textareaRef} />
-              </PopoverContent>
-            </Popover>
+            {!isOnRecord && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    disabled={isPending}
+                    className="opacity-65"
+                  >
+                    <SmilePlus size={20} />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <Emoji setValue={setValue} textareaRef={textareaRef} />
+                </PopoverContent>
+              </Popover>
+            )}
 
             {/* gif btn */}
-            <Popover
-              open={isGifOpen}
-              onOpenChange={(open) => setIsGifOpen(open)}
-            >
-              <PopoverTrigger asChild>
+            {!isOnRecord && (
+              <Popover
+                open={isGifOpen}
+                onOpenChange={(open) => setIsGifOpen(open)}
+              >
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="opacity-65"
+                    disabled={isPending}
+                  >
+                    <ImagePlay size={20} />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <Gif
+                    setIsPending={setIsPending}
+                    setIsGifOpen={setIsGifOpen}
+                  />
+                </PopoverContent>
+              </Popover>
+            )}
+
+            {/* asset btn */}
+            {!isOnRecord && (
+              <>
                 <button
                   type="button"
                   className="opacity-65"
-                  disabled={isPending}
+                  disabled={isPending || isOnEdit}
+                  onClick={() => inputRef.current?.click()}
                 >
-                  <ImagePlay size={20} />
+                  <Camera size={20} />
                 </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="end">
-                <Gif setIsPending={setIsPending} setIsGifOpen={setIsGifOpen} />
-              </PopoverContent>
-            </Popover>
+                <input
+                  ref={inputRef}
+                  hidden
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileChange(e.target.files)}
+                  className="hidden"
+                />
+              </>
+            )}
 
-            {/* asset btn */}
-            <>
-              <button
-                type="button"
-                className="opacity-65"
-                disabled={isPending || isOnEdit}
-                onClick={() => inputRef.current?.click()}
-              >
-                <Camera size={20} />
-              </button>
-              <input
-                ref={inputRef}
-                hidden
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleFileChange(e.target.files)}
-                className="hidden"
-              />
-            </>
+            {/* vocal input */}
+            <VoiceInput setIsOnRecord={setIsOnRecord} />
           </div>
 
           {/* send btn */}
-          <button
-            type="button"
-            disabled={isPending || (!value && !asset)}
-            onClick={onSend}
-            className="pl-4 opacity-65"
-            ref={sendBtnRef}
-          >
-            {isPending ? (
-              <LoaderCircle className="animate-spin" />
-            ) : (
-              <SendHorizonal size={20} />
-            )}
-          </button>
+          {!isOnRecord && (
+            <button
+              type="button"
+              disabled={isPending || (!value && !asset)}
+              onClick={onSend}
+              className="pl-4 opacity-65"
+              ref={sendBtnRef}
+            >
+              {isPending ? (
+                <LoaderCircle className="animate-spin" />
+              ) : (
+                <SendHorizonal size={20} />
+              )}
+            </button>
+          )}
         </div>
       </form>
     </div>

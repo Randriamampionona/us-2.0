@@ -44,6 +44,7 @@ import { useTheme } from "next-themes";
 import { useReply } from "@/store/use-reply.store";
 import MessageReply from "./message-reply";
 import { toastify } from "@/utils/toastify";
+import AudioPlayer from "./audio-palyer";
 
 type TProps = {
   message: TMessage;
@@ -160,12 +161,15 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
     hasSeenOrReaction: !!message.reaction || !!message.is_seen,
     hasAsset: !!message.asset && !message.message,
     hasGif: !!message.gif && !message.message,
+    hasAudio: !!message.audio && !message.message,
     receiverOnlyEmoji:
       !isSender(message.sender_id) && isSingleEmoji(message.message),
     receiverOnlyAsset:
       !isSender(message.sender_id) && message.asset && !message.message,
     receiverOnlyGif:
       !isSender(message.sender_id) && message.gif && !message.message,
+    receiverOnlyAudio:
+      !isSender(message.sender_id) && message.audio && !message.message,
   };
 
   const messageUI = {
@@ -184,6 +188,10 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
       receiver: "!text-foreground",
     },
     gif: {
+      default: "bg-transparent p-0",
+      receiver: "!text-foreground",
+    },
+    audio: {
       default: "bg-transparent p-0",
       receiver: "!text-foreground",
     },
@@ -226,7 +234,8 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
               messageUX.hasSeenOrReaction && messageUI.hasSeenOrReaction,
               isSingleEmoji(message.message) && messageUI.emoji.default,
               messageUX.hasAsset && messageUI.assets.default,
-              messageUX.hasGif && messageUI.gif.default
+              messageUX.hasGif && messageUI.gif.default,
+              messageUX.hasAudio && messageUI.audio.default
             )}
             onDoubleClick={triggerReply}
           >
@@ -286,6 +295,14 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
               />
             )}
 
+            {/* Audio */}
+            {message.audio && (
+              <AudioPlayer
+                src={message.audio.secure_url}
+                isSender={isSender(message.sender_id)}
+              />
+            )}
+
             {/* message */}
             {isValidUrl(message.message) ? (
               <LinkPreviewer url={message.message} />
@@ -319,7 +336,9 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
 
                   messageUX.receiverOnlyAsset && messageUI.assets.receiver,
 
-                  messageUX.receiverOnlyGif && messageUI.gif.receiver
+                  messageUX.receiverOnlyGif && messageUI.gif.receiver,
+
+                  messageUX.receiverOnlyAudio && messageUI.audio.receiver
                 )}
               >
                 {formatTimeAgo(message.editedAt, true)}
@@ -333,7 +352,9 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
 
                   messageUX.receiverOnlyAsset && messageUI.assets.receiver,
 
-                  messageUX.receiverOnlyGif && messageUI.gif.receiver
+                  messageUX.receiverOnlyGif && messageUI.gif.receiver,
+
+                  messageUX.receiverOnlyAudio && messageUI.audio.receiver
                 )}
               >
                 {formatTimeAgo(message.timestamp, false)}
