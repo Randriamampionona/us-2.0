@@ -2,8 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Play, Pause } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export default function AudioPlayer({ src }: { src: string }) {
+type TProps = {
+  src: string;
+  isSender: boolean;
+};
+
+export default function AudioPlayer({ src, isSender }: TProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -63,7 +69,14 @@ export default function AudioPlayer({ src }: { src: string }) {
       : `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
   return (
-    <div className="flex items-center bg-transparent text-foreground rounded-full w-full max-w-md px-4 py-2 gap-3">
+    <div
+      className={cn(
+        "flex items-center rounded-md w-full max-w-md px-4 py-2 gap-3",
+        isSender
+          ? "bg-loveRose text-foreground rounded-br-none"
+          : "bg-gray-200 rounded-bl-none"
+      )}
+    >
       {/* preload animation classes */}
       <div className="hidden animate-waveBounce animate-wavePulse" />
 
@@ -79,7 +92,10 @@ export default function AudioPlayer({ src }: { src: string }) {
         {barHeights.current.map((height, i) => (
           <div
             key={i}
-            className="w-1 rounded-full bg-white origin-center transition-all duration-300 ease-in-out"
+            className={cn(
+              "w-1 rounded-full origin-center transition-all duration-300 ease-in-out",
+              isSender ? "bg-foreground" : "bg-background"
+            )}
             style={{
               height: `${height}px`,
               animation: isPlaying
@@ -91,7 +107,7 @@ export default function AudioPlayer({ src }: { src: string }) {
       </div>
 
       {/* Timestamp */}
-      <span className="text-foreground text-sm text-right">
+      <span className="text-sm text-right">
         {formatTime(progress)} / {formatTime(duration)}
       </span>
     </div>
