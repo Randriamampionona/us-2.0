@@ -22,6 +22,12 @@ export default function MessageReply({ className, message }: Tprops) {
       )}
       onClick={() => setShowAll((state) => !state)}
     >
+      {!!message.content.audio && (
+        <p className={cn("!text-muted-foreground", inter.className)}>
+          Voice message
+        </p>
+      )}
+
       {!!message.content.assets && (
         <Image
           src={message.content.assets.secure_url}
