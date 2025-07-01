@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 type TProps = {
   isPaused: boolean;
   setIsPaused: Dispatch<SetStateAction<boolean>>;
-  pauseRecording: () => Promise<void>;
-  resumeRecording: () => Promise<void>;
+  pauseRecording: () => void;
+  resumeRecording: () => void;
   deleteRecording: () => Promise<void>;
 };
 

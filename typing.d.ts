@@ -14,6 +14,7 @@ type ReplyToInfo = {
     message: string;
     assets?: UploadApiResponse;
     gif?: TenorImage;
+    audio?: UploadApiResponse;
   };
   username: string;
   senderId: string;

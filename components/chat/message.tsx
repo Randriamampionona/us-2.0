@@ -109,6 +109,7 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
     const content = {
       message: message.message,
       assets: message.asset,
+      audio: message.audio,
       gif: {
         ...message.gif,
         id: message.gif?.id ?? "",

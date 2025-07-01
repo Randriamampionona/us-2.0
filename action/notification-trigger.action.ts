@@ -33,6 +33,8 @@ export async function notificationTrigger({
         ? `${formattedData.username} shared an image`
         : formattedData.gif
         ? `${formattedData.username} sent a GIF`
+        : formattedData.audio
+        ? `${formattedData.username} sent a voice message`
         : `New message from ${formattedData.username}`;
 
       body = formattedData.asset

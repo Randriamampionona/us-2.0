@@ -12,6 +12,8 @@ export default function ReplyToMessageBanner() {
     ? replyTo?.content.message
     : replyTo?.content.assets
     ? "Attachement"
+    : replyTo?.content.audio
+    ? "Voice message"
     : replyTo?.content.gif
     ? "GIF"
     : "Message";
