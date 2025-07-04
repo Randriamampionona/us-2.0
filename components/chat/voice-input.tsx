@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect, Dispatch, SetStateAction } from "react";
+import { useState, useRef, Dispatch, SetStateAction } from "react";
 import { uploadAudio } from "@/action/upload-audio.action";
 import { sendMessage } from "@/action/send-message.action";
 import { toastify } from "@/utils/toastify";
-import { Mic, SendHorizonal, Pause, Play, Trash2, Loader2 } from "lucide-react";
+import { Mic, SendHorizonal, Trash2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TMessageDataToSend } from "@/typing";
 import { useAuth, useUser } from "@clerk/nextjs";
@@ -187,12 +187,18 @@ export default function VoiceInput({ isOnRecord, setIsOnRecord }: TProps) {
   // Start recording handler
   const startRecording = async () => {
     try {
-      abortedRef.current = false; // reset abort flag on new recording
+      abortedRef.current = false;
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
-      mediaRecorderRef.current = new MediaRecorder(stream);
+      let mimeType = "audio/mp4";
+
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = "audio/webm;codecs=opus";
+      }
+
+      mediaRecorderRef.current = new MediaRecorder(stream, { mimeType });
       chunksRef.current = [];
 
       mediaRecorderRef.current.ondataavailable = (event) => {
@@ -203,17 +209,15 @@ export default function VoiceInput({ isOnRecord, setIsOnRecord }: TProps) {
 
       mediaRecorderRef.current.onstop = () => {
         if (abortedRef.current) {
-          // Reset abort flag and skip preview
           abortedRef.current = false;
           return;
         }
 
-        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+        const blob = new Blob(chunksRef.current, { type: mimeType });
         setAudioBlob(blob);
         const url = URL.createObjectURL(blob);
         setAudioURL(url);
 
-        // Stop mic
         streamRef.current?.getTracks().forEach((track) => track.stop());
 
         cleanupVisualizer();
@@ -415,13 +419,14 @@ export default function VoiceInput({ isOnRecord, setIsOnRecord }: TProps) {
         <div className="flex-1 flex items-center w-full space-x-3">
           <button
             type="button"
+            disabled={isUploading}
             onClick={deleteRecording}
             className="opacity-65"
             aria-label="Delete recording"
           >
             <Trash2 size={20} />
           </button>
-          {/* <audio src={audioURL} controls className="rounded-md " /> */}
+
           <AudioVisualizer src={audioURL} />
 
           <button
@@ -441,6 +446,7 @@ export default function VoiceInput({ isOnRecord, setIsOnRecord }: TProps) {
           <button
             type="button"
             onClick={startRecording}
+            disabled={isUploading}
             className="opacity-65"
             aria-label="Record again"
           >

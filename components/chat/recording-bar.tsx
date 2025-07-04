@@ -1,4 +1,3 @@
-import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { Pause, Play, SendHorizonal, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 

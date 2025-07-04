@@ -207,7 +207,7 @@ export default function AudioVisualizer({ src }: { src: string }) {
         </button>
 
         <div className="bg-loveRose flex items-center justify-center h-full px-2">
-          {formatTime(currentTime)}
+          {formatTime(currentTime)} / {formatTime(duration)}
         </div>
       </div>
 
