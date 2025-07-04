@@ -309,7 +309,12 @@ export default function ChatForm() {
             isOnRecord ? "justify-center" : "justify-end"
           )}
         >
-          <div className="flex items-center space-x-4">
+          <div
+            className={cn(
+              "flex items-center space-x-4",
+              isOnRecord && "flex-1"
+            )}
+          >
             {/* emoji btn */}
             {!isOnRecord && (
               <Popover>
@@ -375,7 +380,7 @@ export default function ChatForm() {
             )}
 
             {/* vocal input */}
-            <VoiceInput setIsOnRecord={setIsOnRecord} />
+            <VoiceInput setIsOnRecord={setIsOnRecord} isOnRecord={isOnRecord} />
           </div>
 
           {/* send btn */}

@@ -1,49 +1,32 @@
 import { useState, useEffect, Dispatch, SetStateAction } from "react";
-import { Pause, Play, Trash } from "lucide-react";
+import { Pause, Play, SendHorizonal, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type TProps = {
   isPaused: boolean;
-  setIsPaused: Dispatch<SetStateAction<boolean>>;
+  timer: string;
   pauseRecording: () => void;
   resumeRecording: () => void;
-  deleteRecording: () => Promise<void>;
+  abortRecording: () => void;
+  stopRecording: () => void;
 };
 
 export default function RecordingBar({
   isPaused,
+  timer,
   pauseRecording,
   resumeRecording,
-  deleteRecording,
+  abortRecording,
+  stopRecording,
 }: TProps) {
-  const [timer, setTimer] = useState(0);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-
-    if (!isPaused) {
-      interval = setInterval(() => setTimer((t) => t + 1), 1000);
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isPaused]);
-
-  const formatTime = (t: number) => `0:${t.toString().padStart(2, "0")}`;
-
-  const handleToggle = async () => {
-    if (isPaused) {
-      await resumeRecording();
-    } else {
-      await pauseRecording();
-    }
+  const handlePausePlay = () => {
+    isPaused ? resumeRecording() : pauseRecording();
   };
 
   return (
     <div className="flex items-center max-w-full w-full space-x-2">
       {/* Trash Icon */}
-      <button className="text-white" type="button" onClick={deleteRecording}>
+      <button className="opacity-65" type="button" onClick={abortRecording}>
         <Trash size={20} />
       </button>
 
@@ -55,11 +38,11 @@ export default function RecordingBar({
         )}
       >
         {/* Pause/Play Toggle */}
-        <button type="button" onClick={handleToggle}>
+        <button type="button" onClick={handlePausePlay}>
           {isPaused ? (
-            <Play className="w-5 h-5 text-white" />
+            <Play className="w-5 h-5 text-foreground" />
           ) : (
-            <Pause className="w-5 h-5 text-white" />
+            <Pause className="w-5 h-5 text-foreground" />
           )}
         </button>
 
@@ -82,9 +65,13 @@ export default function RecordingBar({
 
         {/* Timer */}
         <div>
-          <p className="text-sm">{formatTime(timer)}</p>
+          <p className="text-sm">{timer}</p>
         </div>
       </div>
+
+      <button type="button" className="opacity-65" onClick={stopRecording}>
+        <SendHorizonal size={20} />
+      </button>
     </div>
   );
 }
