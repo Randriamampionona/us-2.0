@@ -4,6 +4,7 @@ import { ReplyToInfo } from "@/typing";
 import { useState } from "react";
 import Image from "next/image";
 import { Button } from "../ui/button";
+import { ExternalLink } from "lucide-react";
 
 type Tprops = {
   className: string;
@@ -22,12 +23,12 @@ export default function MessageReply({ className, message }: Tprops) {
   return (
     <div
       className={cn(
-        "!bg-muted-foreground/5 top-2 cursor-default opacity-45 hover:opacity-60",
+        "relative !bg-muted-foreground/5 top-2 cursor-default opacity-45 hover:opacity-60",
         className
       )}
-      onClick={() => setShowAll((state) => !state)}
+      onDoubleClick={() => setShowAll((state) => !state)}
+      onClick={goToMessage}
     >
-      <Button onClick={goToMessage}>Click</Button>
       {!!message.content.audio && (
         <p className={cn("!text-muted-foreground", inter.className)}>
           Voice message

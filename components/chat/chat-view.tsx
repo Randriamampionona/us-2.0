@@ -14,6 +14,7 @@ import { setSeen } from "@/action/set-seen.action";
 import { useAuth } from "@clerk/nextjs";
 import ImagePreview from "./image-preview";
 import { useImagePreview } from "@/store/use-image-preview.store";
+import ScrollDownBtn from "./scroll-down-btn";
 
 const CHATCOLECTION =
   process.env.NODE_ENV === "development"
@@ -25,9 +26,10 @@ export default function ChatView() {
   const { imageData } = useImagePreview();
   const [messages, setMessages] = useState<TMessages>([]);
   const [loading, setLoading] = useState(true);
-  const endOfListRef = useRef<HTMLDivElement | null>(null);
   const [trigger, setTrigger] = useState(false);
   const [openPreview, setOpenPreview] = useState(false);
+  const endOfListRef = useRef<HTMLDivElement | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const { ref, inView } = useInView({
     threshold: 0,
@@ -121,7 +123,10 @@ export default function ChatView() {
           {!!imageData && (
             <ImagePreview open={openPreview} setOpen={setOpenPreview} />
           )}
-          <div className="flex-1 w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-fit overflow-y-auto overflow-x-hidden px-2">
+          <div
+            ref={scrollContainerRef}
+            className="relative flex-1 w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-fit overflow-y-auto overflow-x-hidden px-2"
+          >
             {messages.map((message) => (
               <Message
                 key={message.id}
@@ -131,6 +136,12 @@ export default function ChatView() {
               />
             ))}
             <div ref={endOfListRef} className="h-4" />
+
+            {/* Scroll to botton btn */}
+            <ScrollDownBtn
+              scrollContainerRef={scrollContainerRef}
+              endOfListRef={endOfListRef}
+            />
           </div>
         </>
       ) : (
