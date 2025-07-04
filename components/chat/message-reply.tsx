@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { ReplyToInfo } from "@/typing";
 import { useState } from "react";
 import Image from "next/image";
+import { Button } from "../ui/button";
 
 type Tprops = {
   className: string;
@@ -14,6 +15,10 @@ const inter = Inter({ subsets: ["latin"] });
 export default function MessageReply({ className, message }: Tprops) {
   const [showAll, setShowAll] = useState(false);
 
+  const goToMessage = () => {
+    window.location.hash = message.content.message_id;
+  };
+
   return (
     <div
       className={cn(
@@ -22,6 +27,7 @@ export default function MessageReply({ className, message }: Tprops) {
       )}
       onClick={() => setShowAll((state) => !state)}
     >
+      <Button onClick={goToMessage}>Click</Button>
       {!!message.content.audio && (
         <p className={cn("!text-muted-foreground", inter.className)}>
           Voice message

@@ -45,6 +45,7 @@ import { useReply } from "@/store/use-reply.store";
 import MessageReply from "./message-reply";
 import { toastify } from "@/utils/toastify";
 import AudioPlayer from "./audio-palyer";
+import useLinkTracker from "@/hooks/use-link-tracker";
 
 type TProps = {
   message: TMessage;
@@ -67,6 +68,7 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
   const { userId } = useAuth();
   const { user } = useUser();
   const { theme } = useTheme();
+  const { hashId } = useLinkTracker();
   const { replyTo, setReplyId } = useReply();
 
   const { setNewMessage } = useEditMessage();
@@ -107,6 +109,7 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
 
   const triggerReply = () => {
     const content = {
+      message_id: message.id,
       message: message.message,
       assets: message.asset,
       audio: message.audio,
@@ -201,11 +204,15 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
 
   return (
     <>
+      {/* tracking */}
+      <div id={message.id} />
+
       {message.is_deleted ? (
         <p
           className={cn(
             "px-4 py-3 mb-14 border border-muted-foreground text-muted-foreground opacity-50 italic select-none cursor-default rounded-md w-fit max-w-[calc(100%-3rem)] md:max-w-[calc(100%-7rem)] lg:max-w-[calc(100%-13rem)]",
-            isSender(message.sender_id) && "ml-auto"
+            isSender(message.sender_id) && "ml-auto",
+            message.id === hashId && "animate-pulse"
           )}
         >
           {message.sender_id != userId ? message.username : "You"} unsent a
@@ -229,6 +236,7 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
           <div
             className={cn(
               "mb-14",
+              message.id === hashId && "animate-pulse",
               isSender(message.sender_id)
                 ? messageUI.default.sender
                 : messageUI.default.receiver,

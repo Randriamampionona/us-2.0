@@ -11,6 +11,7 @@ type TReaction = {
 type ReplyToInfo = {
   id: string;
   content: {
+    message_id: string;
     message: string;
     assets?: UploadApiResponse;
     gif?: TenorImage;
