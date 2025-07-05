@@ -57,7 +57,7 @@ export default function MessageReply({ className, message }: Tprops) {
         />
       )}
 
-      {showAll ? (
+      {/* {showAll ? (
         <p className={cn("!text-muted-foreground", inter.className)}>
           {message.content.message}
         </p>
@@ -67,7 +67,10 @@ export default function MessageReply({ className, message }: Tprops) {
         >
           {message.content.message}
         </p>
-      )}
+      )} */}
+      <p className={cn("!text-muted-foreground", inter.className)}>
+        {message.content.message}
+      </p>
     </div>
   );
 }
