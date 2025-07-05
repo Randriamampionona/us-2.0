@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils";
 type TProps = {
   src: string;
   isSender: boolean;
+  isReply: boolean;
 };
 
-export default function AudioPlayer({ src, isSender }: TProps) {
+export default function AudioPlayer({ src, isSender, isReply }: TProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -74,7 +75,8 @@ export default function AudioPlayer({ src, isSender }: TProps) {
         "flex items-center rounded-md w-full max-w-md px-4 py-2 gap-3",
         isSender
           ? "bg-loveRose text-foreground rounded-br-none"
-          : "bg-gray-200 rounded-bl-none"
+          : "bg-gray-200 rounded-bl-none",
+        isReply && "bg-transparent text-foreground p-0"
       )}
     >
       {/* preload animation classes */}
@@ -94,7 +96,8 @@ export default function AudioPlayer({ src, isSender }: TProps) {
             key={i}
             className={cn(
               "w-1 rounded-full origin-center transition-all duration-300 ease-in-out",
-              isSender ? "bg-foreground" : "bg-background"
+              isSender ? "bg-foreground" : "bg-background",
+              isReply && "bg-foreground"
             )}
             style={{
               height: `${height}px`,

@@ -3,8 +3,7 @@ import { cn } from "@/lib/utils";
 import { ReplyToInfo } from "@/typing";
 import { useState } from "react";
 import Image from "next/image";
-import { Button } from "../ui/button";
-import { ExternalLink } from "lucide-react";
+import AudioPlayer from "./audio-palyer";
 
 type Tprops = {
   className: string;
@@ -16,23 +15,28 @@ const inter = Inter({ subsets: ["latin"] });
 export default function MessageReply({ className, message }: Tprops) {
   const [showAll, setShowAll] = useState(false);
 
-  const goToMessage = () => {
-    window.location.hash = message.content.message_id;
-  };
+  const isNoMessageContent =
+    !!message.content.audio ||
+    !!message.content.assets ||
+    (!!message.content.gif &&
+      !!message.content.gif.url &&
+      message.content.message == "");
 
   return (
     <div
       className={cn(
-        "relative !bg-muted-foreground/5 top-2 cursor-default opacity-45 hover:opacity-60",
-        className
+        "relative !bg-muted-foreground/10 top-2 cursor-default opacity-45 hover:opacity-60",
+        className,
+        isNoMessageContent && ""
       )}
-      onDoubleClick={() => setShowAll((state) => !state)}
-      onClick={goToMessage}
+      onClick={() => setShowAll((state) => !state)}
     >
       {!!message.content.audio && (
-        <p className={cn("!text-muted-foreground", inter.className)}>
-          Voice message
-        </p>
+        <AudioPlayer
+          src={message.content.audio.secure_url}
+          isSender={false}
+          isReply
+        />
       )}
 
       {!!message.content.assets && (
