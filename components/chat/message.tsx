@@ -37,7 +37,6 @@ import { useEditMessage } from "@/store/use-edit-message.store";
 import { setReaction } from "@/action/set-reaction.action";
 import Image from "next/image";
 import { isValidUrl } from "@/utils/link-checker";
-import LinkPreviewer from "./link-preview";
 import { useImagePreview } from "@/store/use-image-preview.store";
 import { isSingleEmoji } from "@/utils/emoji-checker";
 import { useTheme } from "next-themes";
@@ -45,6 +44,7 @@ import { useReply } from "@/store/use-reply.store";
 import MessageReply from "./message-reply";
 import { toastify } from "@/utils/toastify";
 import AudioPlayer from "./audio-palyer";
+import LinkPreviewer from "./link-previewer";
 
 type TProps = {
   message: TMessage;
@@ -164,6 +164,7 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
     hasAsset: !!message.asset && !message.message,
     hasGif: !!message.gif && !message.message,
     hasAudio: !!message.audio && !message.message,
+    isLink: isValidUrl(message.message),
     receiverOnlyEmoji:
       !isSender(message.sender_id) && isSingleEmoji(message.message),
     receiverOnlyAsset:
@@ -194,6 +195,10 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
       receiver: "!text-foreground",
     },
     audio: {
+      default: "bg-transparent p-0",
+      receiver: "!text-foreground",
+    },
+    link: {
       default: "bg-transparent p-0",
       receiver: "!text-foreground",
     },
@@ -240,7 +245,8 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
               isSingleEmoji(message.message) && messageUI.emoji.default,
               messageUX.hasAsset && messageUI.assets.default,
               messageUX.hasGif && messageUI.gif.default,
-              messageUX.hasAudio && messageUI.audio.default
+              messageUX.hasAudio && messageUI.audio.default,
+              messageUX.isLink && messageUI.link.default
             )}
             onDoubleClick={triggerReply}
           >
@@ -310,8 +316,11 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
             )}
 
             {/* message */}
-            {isValidUrl(message.message) ? (
-              <LinkPreviewer url={message.message} />
+            {messageUX.isLink ? (
+              <LinkPreviewer
+                url={message.message}
+                isSender={isSender(message.sender_id)}
+              />
             ) : (
               <p
                 className={cn(
@@ -344,7 +353,9 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
 
                   messageUX.receiverOnlyGif && messageUI.gif.receiver,
 
-                  messageUX.receiverOnlyAudio && messageUI.audio.receiver
+                  messageUX.receiverOnlyAudio && messageUI.audio.receiver,
+
+                  messageUX.isLink && messageUI.link.receiver
                 )}
               >
                 {formatTimeAgo(message.editedAt, true)}
@@ -360,7 +371,9 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
 
                   messageUX.receiverOnlyGif && messageUI.gif.receiver,
 
-                  messageUX.receiverOnlyAudio && messageUI.audio.receiver
+                  messageUX.receiverOnlyAudio && messageUI.audio.receiver,
+
+                  messageUX.isLink && messageUI.link.receiver
                 )}
               >
                 {formatTimeAgo(message.timestamp, false)}
