@@ -133,6 +133,24 @@ export default function ChatForm() {
     }
   };
 
+  const handleImgPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const items = e.clipboardData.items;
+    for (const item of items) {
+      if (item.type.indexOf("image") !== -1) {
+        const blob = item.getAsFile();
+        if (blob) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const base64Image = event.target?.result as string;
+            setAsset(base64Image); // set preview
+            // Optionally, upload base64Image to server here
+          };
+          reader.readAsDataURL(blob);
+        }
+      }
+    }
+  };
+
   const onSend = async () => {
     if (isPending || !userId || !user || (!value.trim() && !asset)) return;
 
@@ -298,6 +316,7 @@ export default function ChatForm() {
               value={value}
               disabled={isPending || isOnRecord}
               onChange={onChangeFn}
+              onPaste={handleImgPaste}
             />
           </div>
         )}
