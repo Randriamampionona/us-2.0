@@ -1,7 +1,13 @@
 "use client";
 
 import { TMessage, TMessages } from "@/typing";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import {
+  collection,
+  limitToLast,
+  onSnapshot,
+  orderBy,
+  query,
+} from "firebase/firestore";
 import { use, useEffect, useRef, useState } from "react";
 import Message from "./message";
 import { db } from "@/firebase";
@@ -20,6 +26,8 @@ const CHATCOLECTION =
   process.env.NODE_ENV === "development"
     ? CHATCOLECTION_DEV
     : CHATCOLECTION_PROD;
+
+const MESSAGE_LENGHT = process.env.NODE_ENV === "development" ? 10 : 100;
 
 export default function ChatView() {
   const { userId } = useAuth();
@@ -51,22 +59,20 @@ export default function ChatView() {
   // listen to messages
   useEffect(() => {
     const q = query(
-      collection(db, CHATCOLECTION), // Specify the collection
-      orderBy("timestamp", "asc") // Order by timestamp field in descending order (newest first)
+      collection(db, CHATCOLECTION),
+      orderBy("timestamp", "asc"),
+      limitToLast(MESSAGE_LENGHT)
     );
-    // Reference to the Firestore collection
+
     const unsub = onSnapshot(
       q,
       (snapshot) => {
-        // Map snapshot docs to an array of data
         const fetchedData = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-
-        // Update the state with the fetched data
         setMessages(fetchedData);
-        setLoading(false); // Set loading to false after data is fetched
+        setLoading(false);
       },
       (error) => {
         console.error("Error fetching data: ", error);
@@ -74,19 +80,18 @@ export default function ChatView() {
       }
     );
 
-    // Cleanup the listener when the component unmounts or when `useEffect` reruns
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    // Scroll to the bottom whenever new messages are added
-    if (endOfListRef.current) {
-      endOfListRef.current.scrollIntoView({
-        behavior: "smooth", // Smooth scrolling
-        block: "end", // Scroll to the end of the element
-      });
-    }
-  }, [messages.length]);
+    const lastMessage = messages[messages.length - 1];
+    if (!lastMessage || !endOfListRef.current) return;
+
+    endOfListRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
+  }, [messages[messages.length - 1]?.id]);
 
   useEffect(() => {
     if (inView) {
