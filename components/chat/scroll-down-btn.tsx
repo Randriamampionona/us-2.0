@@ -44,9 +44,9 @@ export default function ScrollDownBtn({
   return (
     <Button
       onClick={scrollToBottom}
-      className="fixed top-8 left-1/2 -translate-x-1/2 flex items-center justify-center px-4 py-2 rounded-full shadow-lg z-50"
+      className="fixed bottom-[7.5rem] left-1/2 -translate-x-1/2 flex items-center justify-center px-4 py-2 rounded-full shadow-xl z-50"
     >
-      <span>Scroll to bottom</span> <ChevronsDown />
+      <span>Scroll to newest</span> <ChevronsDown />
     </Button>
   );
 }
