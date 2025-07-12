@@ -31,7 +31,7 @@ const CHATCOLECTION =
     ? CHATCOLECTION_DEV
     : CHATCOLECTION_PROD;
 
-const MESSAGE_LENGTH = process.env.NODE_ENV === "development" ? 5 : 100;
+const MESSAGE_LENGTH = process.env.NODE_ENV === "development" ? 5 : 25;
 
 export default function ChatView() {
   const { userId } = useAuth();
