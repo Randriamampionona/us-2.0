@@ -97,10 +97,7 @@ export default function ChatView() {
   // Scroll to bottom when a message from self is added
   useEffect(() => {
     if (messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessage.sender_id === userId) {
-        endOfListRef.current?.scrollIntoView({ behavior: "smooth" });
-      }
+      endOfListRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
