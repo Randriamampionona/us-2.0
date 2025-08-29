@@ -64,6 +64,18 @@ export default function ChatView() {
     }
   };
 
+  const userScrolledUp = useRef(false);
+
+  const onScroll = () => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    // if user is not near bottom, mark as scrolled up
+    userScrolledUp.current =
+      container.scrollHeight - container.scrollTop - container.clientHeight >
+      100;
+  };
+
   // Real-time listener for newest messages
   useEffect(() => {
     const q = query(
@@ -97,11 +109,9 @@ export default function ChatView() {
   // Scroll when self sends a message OR when already near bottom
   useEffect(() => {
     if (messages.length === 0) return;
-
     const lastMessage = messages[messages.length - 1];
 
-    // Only scroll if the last message is from self
-    if (lastMessage.sender_id === userId) {
+    if (!userScrolledUp.current || lastMessage.sender_id === userId) {
       endOfListRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, userId]);
@@ -171,6 +181,7 @@ export default function ChatView() {
 
       <div
         ref={scrollContainerRef}
+        onScroll={onScroll}
         className="relative flex-1 w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-[80vh] overflow-y-auto overflow-x-hidden px-2"
       >
         {messages.length > 0 && (
