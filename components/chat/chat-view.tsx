@@ -94,12 +94,22 @@ export default function ChatView() {
     }
   }, [messages.length]);
 
-  // Scroll to bottom when a message from self is added
+  // Scroll when self sends a message OR when already near bottom
   useEffect(() => {
-    if (messages.length > 0) {
+    if (messages.length === 0) return;
+
+    const lastMessage = messages[messages.length - 1];
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const isNearBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight <
+      100;
+
+    if (lastMessage.sender_id === userId || isNearBottom) {
       endOfListRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [messages, userId]);
 
   // Fetch older messages on scroll up
   useEffect(() => {
