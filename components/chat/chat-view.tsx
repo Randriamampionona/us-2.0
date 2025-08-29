@@ -99,14 +99,9 @@ export default function ChatView() {
     if (messages.length === 0) return;
 
     const lastMessage = messages[messages.length - 1];
-    const container = scrollContainerRef.current;
-    if (!container) return;
 
-    const isNearBottom =
-      container.scrollHeight - container.scrollTop - container.clientHeight <
-      100;
-
-    if (lastMessage.sender_id === userId || isNearBottom) {
+    // Only scroll if the last message is from self
+    if (lastMessage.sender_id === userId) {
       endOfListRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, userId]);
