@@ -8,6 +8,9 @@ import { useAuth } from "@clerk/nextjs";
 import { Wifi, WifiOff } from "lucide-react";
 import { useEffect, useState } from "react";
 
+const IS_DEV = process.env.NODE_ENV === "development";
+const INTERVAL_TIME = IS_DEV ? 30000 : 5000;
+
 export default function UserStatus() {
   const { userId } = useAuth();
   const { current: socket } = useSocket();
@@ -25,7 +28,7 @@ export default function UserStatus() {
       socket.on("status:set", (status: boolean) => {
         setIsOnline(status);
       });
-    }, 5000);
+    }, INTERVAL_TIME);
 
     return () => {
       socket.off("status");

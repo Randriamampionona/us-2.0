@@ -44,6 +44,7 @@ export default function ChatView() {
     useState<QueryDocumentSnapshot<DocumentData> | null>(null);
   const [openPreview, setOpenPreview] = useState(false);
   const [trigger, setTrigger] = useState(false);
+  const [isAtBottom, setIsAtBottom] = useState(true);
 
   const endOfListRef = useRef<HTMLDivElement | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
@@ -62,18 +63,6 @@ export default function ChatView() {
     } catch (err) {
       console.error(err);
     }
-  };
-
-  const userScrolledUp = useRef(false);
-
-  const onScroll = () => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    // if user is not near bottom, mark as scrolled up
-    userScrolledUp.current =
-      container.scrollHeight - container.scrollTop - container.clientHeight >
-      100;
   };
 
   // Real-time listener for newest messages
@@ -106,15 +95,12 @@ export default function ChatView() {
     }
   }, [messages.length]);
 
-  // Scroll when self sends a message OR when already near bottom
+  // Scroll to bottom when a message from self is added
   useEffect(() => {
-    if (messages.length === 0) return;
-    const lastMessage = messages[messages.length - 1];
-
-    if (!userScrolledUp.current || lastMessage.sender_id === userId) {
+    if (messages.length > 0) {
       endOfListRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages, userId]);
+  }, [messages]);
 
   // Fetch older messages on scroll up
   useEffect(() => {
@@ -181,7 +167,6 @@ export default function ChatView() {
 
       <div
         ref={scrollContainerRef}
-        onScroll={onScroll}
         className="relative flex-1 w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-[80vh] overflow-y-auto overflow-x-hidden px-2"
       >
         {messages.length > 0 && (
@@ -209,6 +194,7 @@ export default function ChatView() {
         <ScrollDownBtn
           scrollContainerRef={scrollContainerRef}
           endOfListRef={endOfListRef}
+          setIsAtBottom={setIsAtBottom}
         />
       </div>
 
@@ -218,8 +204,8 @@ export default function ChatView() {
         </div>
       )}
 
-      {trigger && othersLastMessage?.is_seen == false && (
-        <div ref={seenRef} className="fixed top-0" />
+      {!isAtBottom && trigger && othersLastMessage?.is_seen == false && (
+        <div ref={seenRef} id="OKOK" className="fixed top-0" />
       )}
     </>
   );
