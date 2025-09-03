@@ -31,7 +31,7 @@ const CHATCOLECTION =
     ? CHATCOLECTION_DEV
     : CHATCOLECTION_PROD;
 
-const MESSAGE_LENGTH = process.env.NODE_ENV === "development" ? 5 : 25;
+const MESSAGE_LENGTH = process.env.NODE_ENV === "development" ? 5 : 75;
 
 export default function ChatView() {
   const { userId } = useAuth();
@@ -44,7 +44,6 @@ export default function ChatView() {
     useState<QueryDocumentSnapshot<DocumentData> | null>(null);
   const [openPreview, setOpenPreview] = useState(false);
   const [trigger, setTrigger] = useState(false);
-  const [isAtBottom, setIsAtBottom] = useState(true);
 
   const endOfListRef = useRef<HTMLDivElement | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
@@ -95,7 +94,7 @@ export default function ChatView() {
     }
   }, [messages.length]);
 
-  // Scroll to bottom when a message from self is added
+  // Scroll to bottom when a message is added
   useEffect(() => {
     if (messages.length > 0) {
       endOfListRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -194,7 +193,6 @@ export default function ChatView() {
         <ScrollDownBtn
           scrollContainerRef={scrollContainerRef}
           endOfListRef={endOfListRef}
-          setIsAtBottom={setIsAtBottom}
         />
       </div>
 
@@ -204,7 +202,7 @@ export default function ChatView() {
         </div>
       )}
 
-      {!isAtBottom && trigger && othersLastMessage?.is_seen == false && (
+      {trigger && othersLastMessage?.is_seen == false && (
         <div ref={seenRef} id="OKOK" className="fixed top-0" />
       )}
     </>

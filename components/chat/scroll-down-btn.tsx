@@ -13,13 +13,11 @@ import { Button } from "../ui/button";
 type Props = {
   scrollContainerRef: RefObject<HTMLDivElement | null>;
   endOfListRef: RefObject<HTMLDivElement | null>;
-  setIsAtBottom: Dispatch<SetStateAction<boolean>>;
 };
 
 export default function ScrollDownBtn({
   scrollContainerRef,
   endOfListRef,
-  setIsAtBottom,
 }: Props) {
   const [show, setShow] = useState(false);
 
@@ -33,7 +31,6 @@ export default function ScrollDownBtn({
 
       // ?? Set threshold here (in pixels)
       setShow(distanceFromBottom > 300);
-      setIsAtBottom(distanceFromBottom > 150);
     };
 
     container.addEventListener("scroll", handleScroll);
