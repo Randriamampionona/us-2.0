@@ -31,7 +31,7 @@ const CHATCOLECTION =
     ? CHATCOLECTION_DEV
     : CHATCOLECTION_PROD;
 
-const MESSAGE_LENGTH = process.env.NODE_ENV === "development" ? 5 : 75;
+const MESSAGE_LENGTH = process.env.NODE_ENV === "development" ? 5 : 30;
 
 export default function ChatView() {
   const { userId } = useAuth();
@@ -111,7 +111,7 @@ export default function ChatView() {
         collection(db, CHATCOLECTION),
         orderBy("timestamp", "asc"),
         endBefore(lastVisible),
-        limitToLast(5)
+        limitToLast(MESSAGE_LENGTH)
       );
 
       const snap = await getDocs(q);
