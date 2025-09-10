@@ -7,7 +7,7 @@ import GifPicker, {
   TenorImage,
 } from "gif-picker-react";
 import { useTheme } from "next-themes";
-import { Dispatch, SetStateAction, useEffect, useRef } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 type TProps = {
   setIsPending: Dispatch<SetStateAction<boolean>>;

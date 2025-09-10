@@ -1,7 +1,7 @@
 "use client";
 
 import { SignedIn, UserButton } from "@clerk/nextjs";
-import { Moon, Settings2, Sun } from "lucide-react";
+import { Settings2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,10 +17,13 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Switch } from "@/components/ui/switch";
 import UserStatus from "./user-status";
+import { useSoundEffect } from "@/store/use-sound-effect.store";
 
 export default function Navbar() {
   const { setTheme } = useTheme();
+  const { isAllowed, setIsAllowed } = useSoundEffect();
 
   const onReload = () => {
     window.location.reload();
@@ -46,9 +49,11 @@ export default function Navbar() {
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={onReload}>Refresh</DropdownMenuItem>
             </DropdownMenuGroup>
+
             <DropdownMenuSeparator />
+
+            <DropdownMenuLabel>Preferences</DropdownMenuLabel>
             <DropdownMenuGroup>
-              <DropdownMenuLabel>Preferences</DropdownMenuLabel>
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>Theme</DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
@@ -65,6 +70,18 @@ export default function Navbar() {
                   </DropdownMenuSubContent>
                 </DropdownMenuPortal>
               </DropdownMenuSub>
+
+              <DropdownMenuItem
+                className="flex justify-between"
+                onSelect={(e) => e.preventDefault()}
+              >
+                <p>Sound effect</p>
+                <Switch
+                  defaultChecked={isAllowed}
+                  className="data-[state=unchecked]:bg-foreground/25"
+                  onCheckedChange={(checked) => setIsAllowed(checked)}
+                />
+              </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>

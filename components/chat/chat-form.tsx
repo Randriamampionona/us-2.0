@@ -57,8 +57,8 @@ export default function ChatForm() {
   const { userId } = useAuth();
   const { user } = useUser();
   const { replyTo, resetReplyId } = useReply();
-
   const { message_id, message, reset } = useEditMessage();
+
   const [value, setValue] = useState("");
   const [asset, setAsset] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);

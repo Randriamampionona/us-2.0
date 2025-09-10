@@ -25,6 +25,8 @@ import { useImagePreview } from "@/store/use-image-preview.store";
 import ScrollDownBtn from "./scroll-down-btn";
 import { deleteMessage } from "@/action/delete-message.action";
 import { setSeen } from "@/action/set-seen.action";
+import SoundPlayer from "./sound-player";
+import { useSoundEffect } from "@/store/use-sound-effect.store";
 
 const CHATCOLECTION =
   process.env.NODE_ENV === "development"
@@ -36,6 +38,7 @@ const MESSAGE_LENGTH = process.env.NODE_ENV === "development" ? 5 : 30;
 export default function ChatView() {
   const { userId } = useAuth();
   const { imageData } = useImagePreview();
+  const { play, setPlay } = useSoundEffect();
 
   const [messages, setMessages] = useState<TMessages>([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +67,9 @@ export default function ChatView() {
     }
   };
 
+  // Keep track of last message ID we've seen
+  const lastMessageIdRef = useRef<string | null>(null);
+
   // Real-time listener for newest messages
   useEffect(() => {
     const q = query(
@@ -78,18 +84,53 @@ export default function ChatView() {
         ...doc.data(),
       }));
 
+      const container = scrollContainerRef.current;
+      const isAtBottom =
+        container &&
+        container.scrollHeight - container.scrollTop - container.clientHeight <
+          50;
+
       setMessages(newMessages);
       setLastVisible(snapshot.docs[0] || null);
       setLoading(false);
+
+      // --- SOUND LOGIC ---
+      const lastMsg = newMessages[newMessages.length - 1] as
+        | TMessage
+        | undefined;
+      if (
+        lastMsg &&
+        lastMsg.id !== lastMessageIdRef.current && // only if it's new
+        lastMsg.sender_id === userId // only if it's mine
+      ) {
+        setPlay(true);
+      }
+      lastMessageIdRef.current = lastMsg?.id || null;
+      // --- END SOUND LOGIC ---
+
+      // prevent from scrolling down when user is reading old messages
+      if (isAtBottom) {
+        requestAnimationFrame(() => {
+          endOfListRef.current?.scrollIntoView({ behavior: "smooth" });
+        });
+      }
     });
 
     return () => unsub();
-  }, []);
+  }, [userId]);
+
+  // Reset play sound after 500ms whenever it changes to true
+  useEffect(() => {
+    if (!play) return;
+
+    const timer = setTimeout(() => setPlay(false), 500);
+    return () => clearTimeout(timer);
+  }, [play]);
 
   // Scroll to bottom once after initial load
   useEffect(() => {
     if (!hasScrolledInitially.current && messages.length > 0) {
-      endOfListRef.current?.scrollIntoView({ behavior: "auto" });
+      endOfListRef.current?.scrollIntoView({ behavior: "smooth" });
       hasScrolledInitially.current = true;
     }
   }, [messages.length]);
@@ -99,7 +140,7 @@ export default function ChatView() {
     if (messages.length > 0) {
       endOfListRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [messages[messages.length - 1]?.id]);
 
   // Fetch older messages on scroll up
   useEffect(() => {
@@ -160,6 +201,9 @@ export default function ChatView() {
 
   return (
     <>
+      {/* This will play the sound whenever there is a new message */}
+      <SoundPlayer />
+
       {imageData && (
         <ImagePreview open={openPreview} setOpen={setOpenPreview} />
       )}
