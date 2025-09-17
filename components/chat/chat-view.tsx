@@ -25,7 +25,7 @@ import { useImagePreview } from "@/store/use-image-preview.store";
 import ScrollDownBtn from "./scroll-down-btn";
 import { deleteMessage } from "@/action/delete-message.action";
 import { setSeen } from "@/action/set-seen.action";
-import SoundPlayer from "./sound-player";
+import NewMessageSentEffectPlayer from "./sound-effect/new-message-sent-effect-player";
 import { useSoundEffect } from "@/store/use-sound-effect.store";
 
 const CHATCOLECTION =
@@ -202,7 +202,7 @@ export default function ChatView() {
   return (
     <>
       {/* This will play the sound whenever there is a new message */}
-      <SoundPlayer />
+      <NewMessageSentEffectPlayer source="/sounds/message-pop.wav" />
 
       {imageData && (
         <ImagePreview open={openPreview} setOpen={setOpenPreview} />

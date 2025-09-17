@@ -3,7 +3,10 @@ import { create } from "zustand";
 type Store = {
   play: boolean;
   setPlay: (play: boolean) => void;
-  source: string | null;
+  source: {
+    onSend: string;
+    onTyping: string;
+  };
   isAllowed: boolean;
   setIsAllowed: (allowed: boolean) => void;
 };
@@ -15,7 +18,10 @@ const SOUND_STORAGE_NAME =
 
 export const useSoundEffect = create<Store>()((set) => ({
   play: false,
-  source: "/sounds/message-pop.wav",
+  source: {
+    onSend: "/sounds/message-pop.wav",
+    onTyping: "/sounds/typing.mp3",
+  },
   setPlay: (play: boolean) => set((state) => ({ ...state, play })),
   isAllowed: (() => {
     if (typeof window !== "undefined") {

@@ -8,7 +8,7 @@ import {
   SendHorizonal,
   SmilePlus,
 } from "lucide-react";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, use, useEffect, useRef, useState } from "react";
 import Emoji from "./emoji";
 import { useEditMessage } from "@/store/use-edit-message.store";
 import { editMessage } from "@/action/edit-message.action";
@@ -40,6 +40,8 @@ import { useReply } from "@/store/use-reply.store";
 import ReplyToMessageBanner from "./reply-to-message-banner";
 import { sendMessage } from "@/action/send-message.action";
 import VoiceInput from "./voice-input";
+import SoundPlayer from "./sound-effect/new-message-sent-effect-player";
+import { useSoundEffect } from "@/store/use-sound-effect.store";
 
 const USERCOLECTION =
   process.env.NODE_ENV === "development"
@@ -58,6 +60,7 @@ export default function ChatForm() {
   const { user } = useUser();
   const { replyTo, resetReplyId } = useReply();
   const { message_id, message, reset } = useEditMessage();
+  const { play, setPlay } = useSoundEffect();
 
   const [value, setValue] = useState("");
   const [asset, setAsset] = useState<string | null>(null);
@@ -250,6 +253,19 @@ export default function ChatForm() {
     return () => unsubscribe(); // cleanup listener
   }, [userId]);
 
+  // play sound on typing user
+  useEffect(() => {
+    !!typingUser && typingUser.typing && setPlay(true);
+  }, [typingUser]);
+
+  // Reset play sound after 500ms whenever it changes to true
+  useEffect(() => {
+    if (!play) return;
+
+    const timer = setTimeout(() => setPlay(false), 500);
+    return () => clearTimeout(timer);
+  }, [play]);
+
   useEffect(() => {
     if (typeof window == undefined) return;
     window.addEventListener("keydown", async (e) => {
@@ -277,6 +293,11 @@ export default function ChatForm() {
         isPending && "opacity-45"
       )}
     >
+      {/* This will play the sound whenever there is a new message */}
+      {!!typingUser && typingUser.typing && (
+        <SoundPlayer source="/sounds/typing.mp3" />
+      )}
+
       {/* typing indicator */}
       {!!typingUser && typingUser.typing && (
         <TypingBubble username={typingUser.username} />

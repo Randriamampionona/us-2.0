@@ -2,8 +2,12 @@
 import { useSoundEffect } from "@/store/use-sound-effect.store";
 import { useEffect, useRef } from "react";
 
-export default function SoundPlayer() {
-  const { play, source, isAllowed } = useSoundEffect();
+type TProps = {
+  source: string;
+};
+
+export default function NewMessageSentEffectPlayer({ source }: TProps) {
+  const { play, isAllowed } = useSoundEffect();
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -11,7 +15,7 @@ export default function SoundPlayer() {
       audioRef.current = new Audio(source);
       audioRef.current.volume = 1;
     }
-  }, [source]);
+  }, [source]); // ?? recreate if source changes
 
   useEffect(() => {
     if (!isAllowed) return; // ?? don't play if disabled
