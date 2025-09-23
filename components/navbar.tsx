@@ -1,7 +1,7 @@
 "use client";
 
 import { SignedIn, UserButton } from "@clerk/nextjs";
-import { Settings2 } from "lucide-react";
+import { MessageSquareMore, Settings2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,10 +20,15 @@ import {
 import { Switch } from "@/components/ui/switch";
 import UserStatus from "./user-status";
 import { useSoundEffect } from "@/store/use-sound-effect.store";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
+  const pathname = usePathname();
   const { setTheme } = useTheme();
   const { isAllowed, setIsAllowed } = useSoundEffect();
+
+  const showButton = pathname === "/chat";
 
   const onReload = () => {
     window.location.reload();
@@ -33,6 +38,13 @@ export default function Navbar() {
     <nav className="fixed flex items-center justify-between w-full p-2 z-50 backdrop-blur-sm bg-transparent">
       <UserStatus />
       <div className="flex items-center justify-end gap-4">
+        {!showButton && (
+          <Button asChild>
+            <Link href="/chat">
+              <span>Go to chat</span> <MessageSquareMore />
+            </Link>
+          </Button>
+        )}
         <div className="relative">
           <SignedIn>
             <UserButton />
