@@ -7,7 +7,7 @@ const CHATCOLECTION =
     ? CHATCOLECTION_DEV
     : CHATCOLECTION_PROD;
 
-export async function deleteMessage(message_id: string) {
+export async function unsentMessage(message_id: string) {
   try {
     const docRef = doc(db, CHATCOLECTION, message_id);
 

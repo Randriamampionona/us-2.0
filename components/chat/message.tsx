@@ -45,6 +45,7 @@ import MessageReply from "./message-reply";
 import { toastify } from "@/utils/toastify";
 import AudioPlayer from "./audio-palyer";
 import LinkPreviewer from "./link-previewer";
+import UnsentMessage from "./unsent-message";
 
 type TProps = {
   message: TMessage;
@@ -211,15 +212,10 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
       <div id={message.id} />
 
       {message.is_deleted ? (
-        <p
-          className={cn(
-            "px-4 py-3 mb-14 border border-muted-foreground text-muted-foreground opacity-50 italic select-none cursor-default rounded-md w-fit max-w-[calc(100%-3rem)] md:max-w-[calc(100%-7rem)] lg:max-w-[calc(100%-13rem)]",
-            isSender(message.sender_id) && "ml-auto"
-          )}
-        >
-          {message.sender_id != userId ? message.username : "You"} unsent a
-          message
-        </p>
+        <UnsentMessage
+          isSender={isSender(message.sender_id)}
+          message={message}
+        />
       ) : (
         <div>
           {/* message reply */}

@@ -23,7 +23,7 @@ import ChatLoading from "./chat-loading";
 import ImagePreview from "./image-preview";
 import { useImagePreview } from "@/store/use-image-preview.store";
 import ScrollDownBtn from "./scroll-down-btn";
-import { deleteMessage } from "@/action/delete-message.action";
+import { unsentMessage } from "@/action/unsent-message.action";
 import { setSeen } from "@/action/set-seen.action";
 import NewMessageSentEffectPlayer from "./sound-effect/new-message-sent-effect-player";
 import { useSoundEffect } from "@/store/use-sound-effect.store";
@@ -64,7 +64,7 @@ export default function ChatView() {
 
   const onDelete = async (id: string) => {
     try {
-      await deleteMessage(id);
+      await unsentMessage(id);
     } catch (err) {
       console.error(err);
     }
