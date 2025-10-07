@@ -27,6 +27,8 @@ import { deleteMessage } from "@/action/delete-message.action";
 import { setSeen } from "@/action/set-seen.action";
 import NewMessageSentEffectPlayer from "./sound-effect/new-message-sent-effect-player";
 import { useSoundEffect } from "@/store/use-sound-effect.store";
+import MessageEffect from "./message-effect";
+import { useMessageEffect } from "@/store/use-message-effect.store";
 
 const CHATCOLECTION =
   process.env.NODE_ENV === "development"
@@ -39,6 +41,7 @@ export default function ChatView() {
   const { userId } = useAuth();
   const { imageData } = useImagePreview();
   const { play, setPlay } = useSoundEffect();
+  const { lastMessage, setLastMessage } = useMessageEffect();
 
   const [messages, setMessages] = useState<TMessages>([]);
   const [loading, setLoading] = useState(true);
@@ -197,6 +200,23 @@ export default function ChatView() {
     return () => clearInterval(iv);
   }, []);
 
+  // triger message effect
+  useEffect(() => {
+    const lastMsg = messages.at(-1)?.message;
+    if (!!lastMsg) setLastMessage(lastMsg.trim());
+  }, [messages[messages.length - 1]?.id]);
+
+  // Reset message effect after 4s
+  useEffect(() => {
+    if (messages[messages.length - 1]?.id !== null) {
+      const timer = setTimeout(() => {
+        setLastMessage(null);
+      }, 4000); // 4 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [lastMessage]);
+
   if (loading) return <ChatLoading />;
 
   return (
@@ -212,6 +232,9 @@ export default function ChatView() {
         ref={scrollContainerRef}
         className="relative flex-1 w-[calc(100vw-2rem)] md:w-[calc(100vw-7rem)] lg:w-[calc(100vw-45rem)] mx-auto h-[80vh] overflow-y-auto overflow-x-hidden px-2"
       >
+        {/* Message effect */}
+        <MessageEffect />
+
         {messages.length > 0 && (
           <div
             ref={topRef}

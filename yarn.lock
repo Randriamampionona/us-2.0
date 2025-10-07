@@ -791,6 +791,18 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
+"@lottiefiles/dotlottie-react@^0.17.1":
+  version "0.17.1"
+  resolved "https://registry.yarnpkg.com/@lottiefiles/dotlottie-react/-/dotlottie-react-0.17.1.tgz#f1daccc90e0b9ef9b4b919274485fc400b9e949e"
+  integrity sha512-n31+90TrG40/n6tNaF8l3uFvDqsFHtNPqlk+OyKrtOoM7Bb7jooe+KXp62gK5vObH/JqVGYQdWDeE/i49zXQcQ==
+  dependencies:
+    "@lottiefiles/dotlottie-web" "0.52.2"
+
+"@lottiefiles/dotlottie-web@0.52.2":
+  version "0.52.2"
+  resolved "https://registry.yarnpkg.com/@lottiefiles/dotlottie-web/-/dotlottie-web-0.52.2.tgz#683673e075fcf81e8d1b0151ec1309e03c12afb1"
+  integrity sha512-aeXCMUB5RdusHrvZ3Py2KaMgQ0w7SdA8NFbPK+SpwqC1UW1CDFZl5vPLueZHju7vLhB1rpPvpQ5fQ0L/KEZt7w==
+
 "@napi-rs/wasm-runtime@^0.2.7":
   version "0.2.8"
   resolved "https://registry.yarnpkg.com/@napi-rs/wasm-runtime/-/wasm-runtime-0.2.8.tgz#642e8390ee78ed21d6b79c467aa610e249224ed6"
@@ -2198,6 +2210,11 @@ emoji-mart@^5.6.0:
   version "5.6.0"
   resolved "https://registry.yarnpkg.com/emoji-mart/-/emoji-mart-5.6.0.tgz#71b3ed0091d3e8c68487b240d9d6d9a73c27f023"
   integrity sha512-eJp3QRe79pjwa+duv+n7+5YsNhRcMl812EcFVwrnRvYKoNPoQb5qxU8DG6Bgwji0akHdp6D4Ln6tYLG58MFSow==
+
+emoji-regex@^10.5.0:
+  version "10.5.0"
+  resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-10.5.0.tgz#be23498b9e39db476226d8e81e467f39aca26b78"
+  integrity sha512-lb49vf1Xzfx080OKA0o6l8DQQpV+6Vg95zyCJX9VB/BqKYlhG7N4wgROUUHRA+ZPUefLnteQOad7z1kT2bV7bg==
 
 emoji-regex@^8.0.0:
   version "8.0.0"

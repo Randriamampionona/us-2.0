@@ -42,6 +42,7 @@ import { sendMessage } from "@/action/send-message.action";
 import VoiceInput from "./voice-input";
 import SoundPlayer from "./sound-effect/new-message-sent-effect-player";
 import { useSoundEffect } from "@/store/use-sound-effect.store";
+import { useMessageEffect } from "@/store/use-message-effect.store";
 
 const USERCOLECTION =
   process.env.NODE_ENV === "development"
@@ -61,6 +62,7 @@ export default function ChatForm() {
   const { replyTo, resetReplyId } = useReply();
   const { message_id, message, reset } = useEditMessage();
   const { play, setPlay } = useSoundEffect();
+  const { lastMessage, setLastMessage } = useMessageEffect();
 
   const [value, setValue] = useState("");
   const [asset, setAsset] = useState<string | null>(null);
@@ -211,6 +213,7 @@ export default function ChatForm() {
       setAsset(null);
       reset();
       resetReplyId();
+      setLastMessage(value.trim());
     }
   };
 
