@@ -1,17 +1,7 @@
 "use client";
 
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
-
-export const emojiMap: Record<string, string> = {
-  "🎉": "/animations/party.lottie",
-  "❤️": "/animations/heart.lottie",
-  "🩷": "/animations/hearts.lottie",
-  "😢": "/animations/crying.lottie",
-  "😂": "/animations/laughing.lottie",
-  "😅": "/animations/lmao.lottie",
-  "🥰": "/animations/feel-in-love.lottie",
-  "🔥": "/animations/fire.lottie",
-};
+import { emojiMap } from "./message-effect";
 
 export default function EmojiLottie({ emoji }: { emoji: string }) {
   const src = emojiMap[emoji];
