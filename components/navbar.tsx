@@ -17,21 +17,34 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import UserStatus from "./user-status";
 import { useSoundEffect } from "@/store/use-sound-effect.store";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useMessageReminder } from "@/store/use-message-reminder.store";
 
 export default function Navbar() {
   const pathname = usePathname();
   const { setTheme } = useTheme();
   const { isAllowed, setIsAllowed } = useSoundEffect();
+  const { interval, setIntervalReminder } = useMessageReminder();
 
   const showButton = pathname === "/chat";
 
   const onReload = () => {
     window.location.reload();
+  };
+
+  const onchangeReminder = (value: string) => {
+    setIntervalReminder(value === "null" ? null : Number(value));
   };
 
   return (
@@ -93,6 +106,33 @@ export default function Navbar() {
                   className="data-[state=unchecked]:bg-foreground/25"
                   onCheckedChange={(checked) => setIsAllowed(checked)}
                 />
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                className="flex justify-between"
+                onSelect={(e) => e.preventDefault()}
+              >
+                <p>Reminder</p>
+
+                <Select
+                  value={interval === null ? "null" : String(interval)}
+                  onValueChange={onchangeReminder}
+                >
+                  <SelectTrigger className="w-20">
+                    <SelectValue
+                      placeholder={interval ? `${interval} min` : "Off"}
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="null">Off</SelectItem>
+                    <SelectItem value="0.5">30 s</SelectItem>
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <SelectItem key={i + 1} value={String(i + 1)}>
+                        {i + 1} min
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

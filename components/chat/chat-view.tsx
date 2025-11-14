@@ -29,6 +29,8 @@ import NewMessageSentEffectPlayer from "./sound-effect/new-message-sent-effect-p
 import { useSoundEffect } from "@/store/use-sound-effect.store";
 import MessageEffect from "./message-effect";
 import { useMessageEffect } from "@/store/use-message-effect.store";
+import { notificationTrigger } from "@/action/notification-trigger.action";
+import { useMessageReminder } from "@/store/use-message-reminder.store";
 
 const CHATCOLECTION =
   process.env.NODE_ENV === "development"
@@ -41,6 +43,7 @@ export default function ChatView() {
   const { userId } = useAuth();
   const { imageData } = useImagePreview();
   const { play, setPlay } = useSoundEffect();
+  const { interval: reminderInterval } = useMessageReminder();
   const { lastMessage, setLastMessage } = useMessageEffect();
 
   const [messages, setMessages] = useState<TMessages>([]);
@@ -216,6 +219,37 @@ export default function ChatView() {
       return () => clearTimeout(timer);
     }
   }, [lastMessage]);
+
+  // 🔔 Periodically check if last message sent by ME is unseen
+  useEffect(() => {
+    if (!reminderInterval || !userId || messages.length === 0) return;
+
+    const formatedIntervalReminder = Number(reminderInterval) * 60 * 1000;
+    console.log(formatedIntervalReminder);
+
+    const interval = setInterval(async () => {
+      // Find last message sent by me
+      const myLastMessage = [...messages]
+        .reverse()
+        .find((msg) => msg.sender_id === userId);
+
+      if (!myLastMessage) return;
+
+      // If NOT seen → send reminder
+      if (!myLastMessage.is_seen) {
+        try {
+          await notificationTrigger({
+            data: null,
+            notificationType: "REMINDER",
+          });
+        } catch (err) {
+          console.error("Reminder notification failed:", err);
+        }
+      }
+    }, formatedIntervalReminder);
+
+    return () => clearInterval(interval);
+  }, [messages, userId, reminderInterval]);
 
   if (loading) return <ChatLoading />;
 

@@ -5,7 +5,7 @@ import { getOtherUser } from "./get-other-user";
 import webpush from "@/lib/webPush";
 
 type TParams<T> = {
-  notificationType: "MESSAGE" | "REACTION";
+  notificationType: "MESSAGE" | "REACTION" | "REMINDER";
   data: T;
 };
 
@@ -14,13 +14,13 @@ export async function notificationTrigger({
   data,
 }: TParams<TMessageDataToSend | TReaction>) {
   try {
-    const notifReceiverId = await getOtherUser();
+    const receiverUser = await getOtherUser();
 
-    if (!notifReceiverId) throw new Error("User not found");
+    if (!receiverUser) throw new Error("User not found");
 
     // 4. Ensure receiver has a subscription
-    if (!notifReceiverId.subscription) {
-      console.log(`User ${notifReceiverId.id} has no subscription.`);
+    if (!receiverUser.subscription) {
+      console.log(`User ${receiverUser.id} has no subscription.`);
       return;
     }
 
@@ -51,6 +51,12 @@ export async function notificationTrigger({
       body = `${formattedData?.reaction}`;
     }
 
+    if (notificationType === "REMINDER") {
+      title = "Message Reminder";
+
+      body = `You have an unread message from ${receiverUser.username} 🥰`;
+    }
+
     // 5. Prepare and send the push notification
     const payload = JSON.stringify({
       title,
@@ -59,7 +65,7 @@ export async function notificationTrigger({
     });
 
     try {
-      await webpush.sendNotification(notifReceiverId.subscription, payload);
+      await webpush.sendNotification(receiverUser.subscription, payload);
     } catch (err) {
       console.error("Error sending push notification:", err);
     }
