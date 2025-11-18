@@ -3,6 +3,7 @@
 import { TMessageDataToSend, TReaction } from "@/typing";
 import { getOtherUser } from "./get-other-user";
 import webpush from "@/lib/webPush";
+import { currentUser } from "@clerk/nextjs/server";
 
 type TParams<T> = {
   notificationType: "MESSAGE" | "REACTION" | "REMINDER";
@@ -52,9 +53,10 @@ export async function notificationTrigger({
     }
 
     if (notificationType === "REMINDER") {
+      const user = await currentUser();
       title = "Message Reminder";
 
-      body = `You have an unread message from ${receiverUser.username} 🥰`;
+      body = `You have an unread message from ${user?.fullName} 🥰`;
     }
 
     // 5. Prepare and send the push notification
