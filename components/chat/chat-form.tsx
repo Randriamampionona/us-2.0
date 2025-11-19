@@ -116,17 +116,17 @@ export default function ChatForm() {
       // Check if the file is an image
       const file = files[0];
       if (file.type.startsWith("image/")) {
-        if (file.size <= 20 * 1024 * 1024) {
-          // < 20MB
+        if (file.size <= 60 * 1024 * 1024) {
+          // < 60MB
           const reader = new FileReader();
           reader.onloadend = () => {
             setAsset(reader.result as string); // Set the data URL as preview
           };
           reader.readAsDataURL(file); // Convert file to a data URL
         } else {
-          alert("File size exceeds 20MB. Please select a smaller file.");
+          alert("File size exceeds 60MB. Please select a smaller file.");
         }
-        // Check if the file size is less than or equal to 20MB
+        // Check if the file size is less than or equal to 60MB
       } else {
         alert("Please select a valid image file.");
       }
