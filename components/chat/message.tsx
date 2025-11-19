@@ -341,7 +341,7 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
             {!!message?.editedAt ? (
               <span
                 className={cn(
-                  "text-[0.7rem] font-light text-nowrap opacity-40",
+                  "text-[0.7rem] font-light text-nowrap opacity-40 select-none",
 
                   messageUX.receiverOnlyEmoji && messageUI.emoji.receiver,
 
@@ -359,7 +359,7 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
             ) : (
               <span
                 className={cn(
-                  "text-[0.7rem] font-light text-nowrap opacity-40",
+                  "text-[0.7rem] font-light text-nowrap opacity-40 select-none",
 
                   messageUX.receiverOnlyEmoji && messageUI.emoji.receiver,
 
