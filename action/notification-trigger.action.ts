@@ -20,7 +20,7 @@ export async function notificationTrigger({
     if (!receiverUser) throw new Error("User not found");
 
     // 4. Ensure receiver has a subscription
-    if (!receiverUser.subscription) {
+    if (!receiverUser.subscriptions) {
       console.log(`User ${receiverUser.id} has no subscription.`);
       return;
     }
@@ -67,7 +67,9 @@ export async function notificationTrigger({
     });
 
     try {
-      await webpush.sendNotification(receiverUser.subscription, payload);
+      for (const sub of receiverUser.subscriptions) {
+        await webpush.sendNotification(sub, payload);
+      }
     } catch (err) {
       console.error("Error sending push notification:", err);
     }

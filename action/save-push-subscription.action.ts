@@ -3,7 +3,7 @@
 
 import { USERCOLECTION_DEV, USERCOLECTION_PROD } from "@/constant";
 import { db } from "@/firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc, arrayUnion, getDoc } from "firebase/firestore";
 
 const USERCOLECTION =
   process.env.NODE_ENV === "development"
@@ -11,11 +11,16 @@ const USERCOLECTION =
     : USERCOLECTION_PROD;
 
 export async function savePushSubscription(userId: string, subscription: any) {
+  const ref = doc(db, USERCOLECTION, userId);
   const subscriptionObject = JSON.parse(JSON.stringify(subscription));
 
-  await setDoc(
-    doc(db, USERCOLECTION, userId),
-    { subscription: subscriptionObject },
-    { merge: true }
-  );
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    await setDoc(ref, { subscriptions: [subscriptionObject] });
+  } else {
+    await updateDoc(ref, {
+      subscriptions: arrayUnion(subscriptionObject),
+    });
+  }
 }

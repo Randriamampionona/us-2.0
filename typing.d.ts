@@ -57,11 +57,11 @@ type TUser = {
   username: string;
   active: true;
   typing: false;
-  subscription?: {
+  subscriptions?: {
     endpoint: string;
     keys: {
       auth: string;
       p256dh: string;
     };
-  };
+  }[];
 };
