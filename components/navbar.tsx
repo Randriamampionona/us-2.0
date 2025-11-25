@@ -27,8 +27,9 @@ import {
 import { Switch } from "@/components/ui/switch";
 import UserStatus from "./user-status";
 import { useSoundEffect } from "@/store/use-sound-effect.store";
+import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, redirect } from "next/navigation";
 import { useMessageReminder } from "@/store/use-message-reminder.store";
 
 export default function Navbar() {
@@ -36,8 +37,14 @@ export default function Navbar() {
   const { setTheme } = useTheme();
   const { isAllowed, setIsAllowed } = useSoundEffect();
   const { interval, setIntervalReminder } = useMessageReminder();
+  const [open, setOpen] = useState(false);
 
   const showButton = pathname === "/chat";
+
+  const onNavigate = (url: string) => {
+    setOpen(false);
+    redirect(url);
+  };
 
   const onReload = () => {
     window.location.reload();
@@ -63,13 +70,22 @@ export default function Navbar() {
             <UserButton />
           </SignedIn>
         </div>
-        <DropdownMenu>
+        <DropdownMenu open={open} onOpenChange={setOpen}>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
               <Settings2 />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56 mr-2" align="start">
+            <DropdownMenuLabel>Menu</DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuItem onClick={() => onNavigate("/gallery")}>
+                Our Gallery
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+
+            <DropdownMenuSeparator />
+
             <DropdownMenuLabel>Settings</DropdownMenuLabel>
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={onReload}>Refresh</DropdownMenuItem>

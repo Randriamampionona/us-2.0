@@ -180,7 +180,7 @@ export default function ImagePreview({ open, setOpen }: TProps) {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center z-[1000]"
+      className="fixed inset-0 bg-black flex justify-center items-center z-[1000]"
       onClick={onClose}
     >
       <div
