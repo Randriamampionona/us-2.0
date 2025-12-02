@@ -26,6 +26,7 @@ import {
 import Picker from "@emoji-mart/react";
 import { Badge } from "@/components/ui/badge";
 import {
+  CheckCheck,
   Clipboard,
   CornerDownLeft,
   Edit,
@@ -332,9 +333,12 @@ export default function Message({ message, onDelete, setOpenPreview }: TProps) {
 
             {/* seen */}
             {message.is_seen && message.sender_id == userId && (
-              <span className="absolute -bottom-6 te right-0 px-2 text-primary/20 italic">
-                seen
+              <span className="absolute -bottom-[17px] right-0 px-1 text-green-600/60 italic">
+                <CheckCheck size={17} />
               </span>
+              // <span className="absolute -bottom-6 te right-0 px-2 text-primary/20 italic">
+              //   seen
+              // </span>
             )}
 
             {/* date */}
