@@ -1,6 +1,7 @@
 "use client";
 
 import { SignedIn, UserButton } from "@clerk/nextjs";
+
 import { MessageSquareMore, Settings2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, redirect } from "next/navigation";
 import { useMessageReminder } from "@/store/use-message-reminder.store";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -38,6 +40,8 @@ export default function Navbar() {
   const { isAllowed, setIsAllowed } = useSoundEffect();
   const { interval, setIntervalReminder } = useMessageReminder();
   const [open, setOpen] = useState(false);
+
+  const isXmasSeason = new Date() <= new Date("2025-12-30T23:59:59");
 
   const showButton = pathname === "/chat";
 
@@ -56,6 +60,15 @@ export default function Navbar() {
 
   return (
     <nav className="fixed flex items-center justify-between w-full p-2 z-50 backdrop-blur-sm bg-transparent">
+      {isXmasSeason && (
+        <DotLottieReact
+          className="absolute top-0 left-0 pointer-events-none select-none"
+          src="/animations/christmas-ornaments.lottie"
+          loop={true}
+          autoplay
+        />
+      )}
+
       <UserStatus />
       <div className="flex items-center justify-end gap-4">
         {!showButton && (
@@ -66,9 +79,20 @@ export default function Navbar() {
           </Button>
         )}
         <div className="relative">
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
+          <div className="relative">
+            {isXmasSeason && (
+              <DotLottieReact
+                className="absolute top-[-9px] right-[-37px] z-10 w-28 h-auto pointer-events-none select-none"
+                src="/animations/christmas-hat.lottie"
+                loop={true}
+                autoplay
+                style={{ width: 75, height: 75 }}
+              />
+            )}
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+          </div>
         </div>
         <DropdownMenu open={open} onOpenChange={setOpen}>
           <DropdownMenuTrigger asChild>
