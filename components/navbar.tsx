@@ -1,6 +1,6 @@
 "use client";
 
-import { SignedIn, UserButton } from "@clerk/nextjs";
+import { SignedIn, UserButton, useAuth } from "@clerk/nextjs";
 
 import { MessageSquareMore, Settings2 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -33,9 +33,12 @@ import Link from "next/link";
 import { usePathname, redirect } from "next/navigation";
 import { useMessageReminder } from "@/store/use-message-reminder.store";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { resetNotification } from "@/action/reset-notification.action";
+import { toastify } from "@/utils/toastify";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const auth = useAuth();
   const { setTheme } = useTheme();
   const { isAllowed, setIsAllowed } = useSoundEffect();
   const { interval, setIntervalReminder } = useMessageReminder();
@@ -52,6 +55,28 @@ export default function Navbar() {
 
   const onReload = () => {
     window.location.reload();
+  };
+
+  const onResetNotification = async () => {
+    const user_id = auth?.userId;
+    try {
+      if (!user_id) {
+        throw new Error("User not authenticated.");
+      }
+      const { success, error } = await resetNotification(user_id);
+      if (!success) {
+        throw new Error(error || "Failed to reset notification.");
+      }
+      toastify("success", "Notification subscriptions have been reset.");
+    } catch (error: any) {
+      toastify(
+        "error",
+        error.message || "An error occurred while resetting notifications."
+      );
+    } finally {
+      // redirect("/admin");
+      window.location.reload();
+    }
   };
 
   const onchangeReminder = (value: string) => {
@@ -113,6 +138,9 @@ export default function Navbar() {
             <DropdownMenuLabel>Settings</DropdownMenuLabel>
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={onReload}>Refresh</DropdownMenuItem>
+              <DropdownMenuItem onClick={onResetNotification}>
+                Reset Notification
+              </DropdownMenuItem>
             </DropdownMenuGroup>
 
             <DropdownMenuSeparator />
