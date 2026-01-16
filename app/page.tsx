@@ -1,3 +1,4 @@
+import BannerUnit from "@/components/ad/banner-unit";
 import GiftButton from "@/components/gift-button";
 import QuotSection from "@/components/quote-section";
 import SecurityCheckPage from "@/components/security-check";
@@ -24,6 +25,7 @@ export default function Home() {
           </Link>{" "}
           &copy; {new Date().getFullYear()}
         </p>
+        <BannerUnit />
       </main>
     </SecurityCheckPage>
   );

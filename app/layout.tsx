@@ -6,7 +6,6 @@ import Navbar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ClerkProvider, SignedIn } from "@clerk/nextjs";
 import { Toaster } from "react-hot-toast";
-import BannerUnit from "@/components/ad/banner-unit";
 import SocialBarUnit from "@/components/ad/social-banner-unit";
 
 const geistSans = Geist({
@@ -48,7 +47,7 @@ export default function RootLayout({
 
             {children}
           </ThemeProvider>
-          <BannerUnit />
+
           <SocialBarUnit />
         </body>
       </html>

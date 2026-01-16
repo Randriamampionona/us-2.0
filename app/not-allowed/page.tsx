@@ -1,3 +1,4 @@
+import BannerUnit from "@/components/ad/banner-unit";
 import { LockKeyhole } from "lucide-react";
 
 export default function NotAllowedPage() {
@@ -21,6 +22,7 @@ export default function NotAllowedPage() {
           </a>
           .
         </p>
+        <BannerUnit />
       </div>
     </div>
   );
