@@ -1,4 +1,5 @@
 import { getSubscriptions } from "@/action/get-subscriptions.action";
+import NativeBar from "@/components/ad/native-bar";
 import { currentUser } from "@clerk/nextjs/server";
 
 export default async function AmdinPage() {
@@ -14,6 +15,7 @@ export default async function AmdinPage() {
     <div>
       AmdinPage
       <pre>{JSON.stringify(subscriptions, null, 2)}</pre>
+      <NativeBar />
     </div>
   );
 }

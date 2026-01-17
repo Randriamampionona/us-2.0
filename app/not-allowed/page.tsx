@@ -1,8 +1,9 @@
+import NativeBar from "@/components/ad/native-bar";
 import { LockKeyhole } from "lucide-react";
 
 export default function NotAllowedPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center flex-col p-4">
       <div className="bg-white rounded-2xl shadow-xl p-10 max-w-md w-full text-center">
         <div className="flex justify-center mb-6 text-red-500">
           <LockKeyhole className="w-16 h-16" />
@@ -22,6 +23,8 @@ export default function NotAllowedPage() {
           .
         </p>
       </div>
+
+      <NativeBar />
     </div>
   );
 }
