@@ -1,5 +1,5 @@
 import { getGalleryImages } from "@/action/get-gallery-images.action";
-import BannerUnit from "@/components/ad/banner-unit";
+import NativeBar from "@/components/ad/native-bar";
 import GalleryGrid from "@/components/gallery/gallery-grid";
 
 export default async function GalleryPage() {
@@ -7,8 +7,8 @@ export default async function GalleryPage() {
 
   return (
     <>
-      <GalleryGrid initialImages={images} initialCursor={nextCursor} />
-      <BannerUnit />
+      <GalleryGrid initialImages={images} initialCursor={nextCursor} />{" "}
+      <NativeBar />
     </>
   );
 }
