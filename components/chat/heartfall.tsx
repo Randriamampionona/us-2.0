@@ -18,7 +18,7 @@ export default function Heartfall() {
 
     const HEARTS = ["❤️", "❤️", "❤️", "❤️", "🌺"]; // ~80/20 mix
 
-    const hearts = Array.from({ length: 13 }).map(() => ({
+    const hearts = Array.from({ length: 9 }).map(() => ({
       char: HEARTS[Math.floor(Math.random() * HEARTS.length)],
       x: Math.random() * W,
       y: H + Math.random() * H,
