@@ -10,7 +10,7 @@ export default async function ChatPage() {
   const user = await currentUser();
 
   const isXmasSeason = new Date() <= new Date("2025-12-30T23:59:59");
-  const ValentinesSeason = new Date() <= new Date("2026-02-14T23:59:59");
+  const ValentinesSeason = new Date() <= new Date("2026-02-28T23:59:59");
 
   return (
     <SecurityCheckPage>
